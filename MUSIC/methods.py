@@ -11,6 +11,7 @@ def music_algorithm(pram,method=0):
     rho = pram.D * (10 ** (-pram.SNR / 10) + 1)
     labels = np.zeros((pram.monte, pram.D))
     teta_vector = np.zeros((pram.monte, pram.D))
+    #print(teta_vector.shape)
     for i in range(0, pram.monte): #Create labels
         if pram.D == 1:
             teta = np.random.randint(pram.teta_range[0], pram.teta_range[1], size=pram.D)
