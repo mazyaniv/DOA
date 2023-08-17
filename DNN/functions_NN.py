@@ -117,7 +117,7 @@ def test_model(model, data, labels,C):
         sub_vec_new = sub_vec_old[mask]
 
         RMSE = (np.sum(np.sum(np.power(sub_vec_new, 2), 1)) / (sub_vec_new.shape[0] * (pred.shape[1]))) ** 0.5
-        # print(f"Accuracy: {accuracy_percentage:.2f}%")
-        # print(f"RMSE : {RMSE:.2f}_Degrees,", "Number of relevant tests:",np.shape(sub_vec_new)[0])
-        # print("======")
+        print(f"Accuracy: {accuracy_percentage:.2f}%")
+        print(f"RMSE : {RMSE:.2f}_Degrees,", "Number of relevant tests:",np.shape(sub_vec_new)[0])
+        print("======")
         return RMSE

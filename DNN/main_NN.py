@@ -13,24 +13,22 @@ if __name__ == "__main__":
     my_parameters = prameters_class(10, 0, 2, [0, 60], 0, 400, 10)
     train_prameters = train_prameters(1000, 50, 100, 10, 0.001)
     my_dict = {"Generate new data":True,
-               "Train": False, "Test": True}
+               "Train": True, "Test": True}
 
     if my_dict["Generate new data"]:
         generate_data(my_parameters,train_prameters,file_path)
-    data_train = np.load(file_path+'Data/'+'data_train.npy')
-    labels_train = np.load(file_path+'Data/'+'labels_train.npy')
-    data_test = np.load(file_path+'Data/'+'data_test.npy')
-    labels_test = np.load(file_path+'Data/'+'labels_test.npy')
+
+    data_file_path = file_path+'Data/'
+    my_data = My_data(data_file_path)
 
     if my_dict["Train"]:
         my_model = CNN(my_parameters.teta_range)
         my_model.weight_init(mean=0, std=0.02)
-
-        my_train(data_train, labels_train, my_model,my_parameters.teta_range, num_epochs=train_prameters.epoch,
+        my_train(my_data.data_train, my_data.labels_train, my_model,my_parameters.teta_range, num_epochs=train_prameters.epoch,
                  batch_size=train_prameters.batch, checkpoint_path='Trained_Model/',checkpoint_bool=True)
 
     elif my_dict["Test"]:
         Model = CNN(my_parameters.teta_range)
         Model.load_state_dict(torch.load(file_path+'Trained_Model/'+'model_checkpoint.pth'))
         Model.eval()
-        print("RMSE:",test_model(Model,data_test,labels_test,my_parameters.C))
+        print("RMSE:",test_model(Model,my_data.data_test,my_data.labels_test,my_parameters.C))

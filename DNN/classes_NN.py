@@ -31,5 +31,12 @@ class Matrix_class():
         self.A = A_mask
         return self.A
 
+class My_data():
+    def __init__(self, file_path):
+        self.data_train = np.load(file_path+'data_train.npy')
+        self.labels_train = np.load(file_path+'labels_train.npy')
+        self.data_test = np.load(file_path+'data_test.npy')
+        self.labels_test = np.load(file_path+'labels_test.npy')
+
 if __name__ == "__main__":
     print("Not main file")
