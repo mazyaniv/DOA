@@ -3,30 +3,30 @@ import numpy as np
 import torch
 from functions_NN import *
 
-def my_train(train,labels,model,teta_range,num_epochs, batch_size,checkpoint_path,checkpoint_bool=False):
+def my_train(data,model,parameters,train_pram,checkpoint_path,checkpoint_bool=False):
   model.train()
   optimizer = optim.Adam(model.parameters())
-  for epoch in range(num_epochs):
+  for epoch in range(train_pram.epoch):
     if epoch>1:
       print(loss)
     if epoch%7 == 0:
       print(f"Epoch number {epoch}")
     #shuffle the data each epoch
-    train_size = train.shape[1]
+    train_size = data.data_train.shape[1]
     per = np.random.permutation(train_size)
-    train = train[:,per]
-    labels = labels[per]
+    train = data.data_train[:,per]
+    labels = data.labels_train[per]
 
-    for i in range(0, train_size, batch_size):
-        if (i + batch_size) > train_size:
+    for i in range(0, train_size, train_pram.batch):
+        if (i + train_pram.batch) > train_size:
             break
         # get the input and targets of a minibatch
-        z,s = get_batch(train, labels, i, i+batch_size,teta_range)
+        z,s = get_batch(train, labels, i, i+train_pram.batch,parameters.teta_range)
         optimizer.zero_grad()
         loss = BCEWithLogitsLoss(model,z,s) # compute the total loss
         loss.backward()
         optimizer.step()
 
   if checkpoint_bool:
-        torch.save(model.state_dict(), checkpoint_path+'model_checkpoint.pth')
+        torch.save(model.state_dict(), checkpoint_path+f'trained_model_N_a={parameters.M-parameters.N_q}_N_q={parameters.N_q}_SNR={parameters.SNR}.pth')
   print("Finish")

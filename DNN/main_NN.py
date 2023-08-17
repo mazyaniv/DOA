@@ -1,34 +1,52 @@
-import torch
-import torch.nn as nn
-import numpy as np
-import math
-from matplotlib import pyplot as pltfrom
-from functions_NN import *
-from classes_NN import *
+from matplotlib import pyplot as plt
 from models import *
 from train_func import *
+from functions_NN import *
+from classes_NN import *
+import torch
+import numpy as np
 
 if __name__ == "__main__":
-    file_path = 'C:/Users/Yaniv/PycharmProjects/DOA/DNN/'  # '/home/mazya/DNN/'
-    my_parameters = prameters_class(10, 0, 2, [0, 60], 0, 400, 10)
-    train_prameters = train_prameters(1000, 50, 100, 10, 0.001)
-    my_dict = {"Generate new data":True,
+    SNR_space = np.linspace(-5, 25, 2)
+    N_a = [0, 10, 5]
+    N_q = [10, 0, 5]
+    Error = np.zeros((len(SNR_space), len(N_a)))
+    my_dict = {"device":"CPU",
+               "Generate new data": True,
                "Train": True, "Test": True}
 
-    if my_dict["Generate new data"]:
-        generate_data(my_parameters,train_prameters,file_path)
+    if my_dict["device"] == "Cuda":
+        file_path = '/home/mazya/DNN/'
+    else:
+        file_path = 'C:/Users/Yaniv/PycharmProjects/DOA/DNN/'
 
-    data_file_path = file_path+'Data/'
-    my_data = My_data(data_file_path)
+    train_prameters = train_prameters(1000, 50, 100, 3, 0.001)
+    for i in range(len(SNR_space)):
+        for j in range(len(N_a)):
+            my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j], SNR_space[i], 400, [0, 60],2,10) #M=N_a+N_q
+            if my_dict["Generate new data"]:
+                generate_data(my_parameters,train_prameters,file_path)
 
-    if my_dict["Train"]:
-        my_model = CNN(my_parameters.teta_range)
-        my_model.weight_init(mean=0, std=0.02)
-        my_train(my_data.data_train, my_data.labels_train, my_model,my_parameters.teta_range, num_epochs=train_prameters.epoch,
-                 batch_size=train_prameters.batch, checkpoint_path='Trained_Model/',checkpoint_bool=True)
+            data_file_path = file_path+'Data/'
+            my_data = My_data(data_file_path,my_parameters)
 
-    elif my_dict["Test"]:
-        Model = CNN(my_parameters.teta_range)
-        Model.load_state_dict(torch.load(file_path+'Trained_Model/'+'model_checkpoint.pth'))
-        Model.eval()
-        print("RMSE:",test_model(Model,my_data.data_test,my_data.labels_test,my_parameters.C))
+            if my_dict["Train"]:
+                my_model = CNN(my_parameters)
+                my_model.weight_init(mean=0, std=0.02)
+                my_train(my_data, my_model,my_parameters, train_prameters, 'Trained_Model/',True)
+
+            elif my_dict["Test"]:
+                Model = CNN(my_parameters)
+                Model.load_state_dict(torch.load(file_path+'Trained_Model/'
+                                                 +f'trained_model_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.pth'))
+                Model.eval()
+                Error[i, j] = test_model(Model,my_data.data_test,my_data.labels_test,my_parameters.C)
+
+    fig = plt.figure(figsize=(10, 6))
+    for i in range(len(N_a)):
+        plt.plot(SNR_space, Error[:, i], label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
+    plt.title(f"RMSE for snap={my_parameters.snap}, M={my_parameters.M}, D={my_parameters.D}")
+    plt.ylabel("RMSE (Deg.)")
+    plt.xlabel("SNR [dB]")
+    plt.legend()
+    plt.show()

@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import numpy as np
 import math
 from classes_NN import *
 
@@ -18,7 +17,7 @@ def generate_data(my_parameters,train_prameters,file_path):
             teta = np.sort(teta)[::-1]
         labels[i, :] = teta
         Observ = quantize_part(observ(teta, my_parameters.M, my_parameters.D, my_parameters.SNR, my_parameters.snap),
-                               my_parameters.P)  # Quantize
+                               my_parameters.N_q)  # Quantize
         R = np.cov(Observ)
         data[0, i, :, :] = np.triu(R, k=1).real
         data[1, i, :, :] = np.triu(R, k=1).imag
@@ -28,10 +27,10 @@ def generate_data(my_parameters,train_prameters,file_path):
     data_test = data[:, -train_prameters.test_size:, :, :]
     labels_test = labels[-train_prameters.test_size:, :]
 
-    np.save(file_path + 'Data/' + 'data_train.npy', data_train)
-    np.save(file_path + 'Data/' + 'labels_train.npy', labels_train)
-    np.save(file_path + 'Data/' + 'data_test.npy', data_test)
-    np.save(file_path + 'Data/' + 'labels_test.npy', labels_test)
+    np.save(file_path + 'Data/' + f'data_train_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.npy', data_train)
+    np.save(file_path + 'Data/' + f'labels_train_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.npy', labels_train)
+    np.save(file_path + 'Data/' + f'data_test_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.npy', data_test)
+    np.save(file_path + 'Data/' + f'labels_test_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.npy', labels_test)
 def observ(teta,M,D,SNR,snap):
     A = Matrix_class(M, teta).matrix()
     real_s = np.random.normal(0, 1 / math.sqrt(2), (D, snap))
@@ -117,7 +116,7 @@ def test_model(model, data, labels,C):
         sub_vec_new = sub_vec_old[mask]
 
         RMSE = (np.sum(np.sum(np.power(sub_vec_new, 2), 1)) / (sub_vec_new.shape[0] * (pred.shape[1]))) ** 0.5
-        print(f"Accuracy: {accuracy_percentage:.2f}%")
-        print(f"RMSE : {RMSE:.2f}_Degrees,", "Number of relevant tests:",np.shape(sub_vec_new)[0])
-        print("======")
+        # print(f"Accuracy: {accuracy_percentage:.2f}%")
+        # print(f"RMSE : {RMSE:.2f}_Degrees,", "Number of relevant tests:",np.shape(sub_vec_new)[0])
+        # print("======")
         return RMSE
