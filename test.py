@@ -1,8 +1,4 @@
-from methods import music_algorithm
-from classes import prameters_class
 import numpy as np
-from matplotlib import pyplot as plt
-
 
 if __name__ == "__main__":
     hi = np.zeros((3,2))
