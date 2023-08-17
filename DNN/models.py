@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch
 import numpy as np
 class CNN(nn.Module):
-    def __init__(self,n1=12,n2=12,n3=6, kernel_size=3,padding_size=2,a=0.5):
+    def __init__(self,teta_range,n1=12,n2=12,n3=6, kernel_size=3,padding_size=2,a=0.5):
         super(CNN, self).__init__()
         self.kernel_size = kernel_size
         self.padding_size = padding_size
@@ -26,7 +26,7 @@ class CNN(nn.Module):
         #fully-connected layers
         self.fc1 = nn.Linear(self.n3*16,1500)
         self.fc2 = nn.Linear(1500,1500)
-        self.fc3 = nn.Linear(1500,61) #Resolution
+        self.fc3 = nn.Linear(1500,teta_range[1]-teta_range[0]+1) #Resolution
 
     def weight_init(self, mean, std):
         for m in self._modules:
@@ -54,10 +54,10 @@ class CNN(nn.Module):
       return x #torch.argmax(x,dim=1)
 
 if __name__ == "__main__":
-    file_path = '/home/mazya/DNN/Data/' #'C:/Users/Yaniv/PycharmProjects/DOA/DNN/'
+    file_path = 'C:/Users/Yaniv/PycharmProjects/DOA/DNN/Data/' #'/home/mazya/DNN/Data/'
     data_train = np.load(file_path + 'data_train.npy')
     x = data_train
     x = torch.tensor(x, requires_grad=True,dtype=torch.float32).transpose(0, 1)
     x = x[0:4]
-    z = CNN()(x)
+    z = CNN([0,60])(x)
     print(z.shape)
