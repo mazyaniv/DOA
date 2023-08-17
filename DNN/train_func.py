@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from functions_NN import *
 
-def my_train(train,labels,model, num_epochs, batch_size,file_path,checkpoint_bool=False):
+def my_train(train,labels,model,teta_range,num_epochs, batch_size,checkpoint_path,checkpoint_bool=False):
   model.train()
   optimizer = optim.Adam(model.parameters())
   for epoch in range(num_epochs):
@@ -21,13 +21,12 @@ def my_train(train,labels,model, num_epochs, batch_size,file_path,checkpoint_boo
         if (i + batch_size) > train_size:
             break
         # get the input and targets of a minibatch
-        z,s = get_batch(train, labels, i, i+batch_size)
+        z,s = get_batch(train, labels, i, i+batch_size,teta_range)
         optimizer.zero_grad()
         loss = BCEWithLogitsLoss(model,z,s) # compute the total loss
         loss.backward()
         optimizer.step()
 
-  checkpoint_path = file_path+'Trained_Model/'
   if checkpoint_bool:
-        torch.save(model.state_dict(), checkpoint_path)
+        torch.save(model.state_dict(), checkpoint_path+'model_checkpoint.pth')
   print("Finish")

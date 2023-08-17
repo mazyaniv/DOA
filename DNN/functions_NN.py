@@ -23,17 +23,17 @@ def quantize_part(A,P,thresh=0):
         mask[P:,:] = A[P:,:]
         return mask
 
-def get_batch(R, labels, inx_min, inx_max):
+def get_batch(R, labels, inx_min, inx_max,teta_range):
   xt = R[:,inx_min:inx_max]
   st = labels[inx_min:inx_max]
   permutation = np.random.permutation(inx_max - inx_min)
-  return xt[:,permutation] , make_onehot(st[permutation]) #Shift or Onehot
+  return xt[:,permutation] , make_onehot(st[permutation],teta_range) #Shift or Onehot
 
-def make_onehot(target): #batch
-    OneHotMask = np.zeros((target.shape[0],teta_max-teta_min+1))
+def make_onehot(target,teta_range): #batch
+    OneHotMask = np.zeros((target.shape[0],teta_range[1]-teta_range[0]+1))
     for i in range(target.shape[0]):
       for j in range(target.shape[1]):
-        OneHotMask[i,int(target[i,j]+shift)] = 1 #Shift
+        OneHotMask[i,int(target[i,j]+0)] = 1 #Shift=0
     return OneHotMask
 
 # criterion = nn.MSELoss(reduction='sum')/torch.nn.CrossEntropyLoss()/torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight) pos_weight = torch.ones([M])  # All weights are equal to 1
