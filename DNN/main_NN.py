@@ -7,23 +7,24 @@ import torch
 import numpy as np
 
 if __name__ == "__main__":
-    SNR_space = np.linspace(-5, 25, 2)
+    SNR_space = np.linspace(-5, 25, 8)
     N_a = [0, 10, 5]
     N_q = [10, 0, 5]
-    Error = np.zeros((len(SNR_space), len(N_a)))
-    my_dict = {"device":"CPU",
-               "Generate new data": True,
-               "Train": True, "Test": True}
-
+    pram = {"snap":400, "teta_range":[0,60], "D":2, "C":10}
+    train_prameters = train_prameters(10000, 100, 100, 20, 0.001)
+    my_dict = {"device":"Cuda",
+               "Generate new data": False,
+               "Train": False, "Test": False}
+# ======================================================================================================================
     if my_dict["device"] == "Cuda":
         file_path = '/home/mazya/DNN/'
     else:
         file_path = 'C:/Users/Yaniv/PycharmProjects/DOA/DNN/'
 
-    train_prameters = train_prameters(1000, 50, 100, 3, 0.001)
+    Error = np.zeros((len(SNR_space), len(N_a)))
     for i in range(len(SNR_space)):
         for j in range(len(N_a)):
-            my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j], SNR_space[i], 400, [0, 60],2,10) #M=N_a+N_q
+            my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j], SNR_space[i], pram["snap"], pram["teta_range"],pram["D"],pram["C"]) #M=N_a+N_q
             if my_dict["Generate new data"]:
                 generate_data(my_parameters,train_prameters,file_path)
 
