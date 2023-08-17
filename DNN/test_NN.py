@@ -1,23 +1,24 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
 import numpy as np
 import math
 from matplotlib import pyplot as pltfrom
 from functions_NN import *
 from classes_NN import *
+from models import *
+from train_func import *
 
 if __name__ == "__main__":
-    my_dect = {"Checking device": False,"Save data":False,"Load data": True}
+    my_dict = {"Checking device": False,"Save data":False,"Load data": True, "Train": True, "Test": False}
 
-    file_path = '/home/mazya/DNN/Data/' #'C:/Users/Yaniv/PycharmProjects/DOA/DNN/'
-    if my_dect["Checking device"]:
+    file_path = '/home/mazya/DNN/' #'C:/Users/Yaniv/PycharmProjects/DOA/DNN/'
+    if my_dict["Checking device"]:
         device = "cuda" if torch.cuda.is_available() else "cpu"
         print(device)
 
     my_parameters = prameters_class(10, 0, 2, [0,60], 0, 400)
     train_prameters = train_prameters(1000, 50, 100, 20, 0.001)
-    if my_dect["Save data"]:
+    if my_dict["Save data"]:
         data = np.zeros((2, train_prameters.N, my_parameters.M, my_parameters.M), dtype=np.complex128)
         labels = np.zeros((train_prameters.N, my_parameters.D))
         for i in range(0, train_prameters.N):
@@ -41,16 +42,23 @@ if __name__ == "__main__":
         data_test = data[:, -train_prameters.test_size:, :, :]
         labels_test = labels[-train_prameters.test_size:, :]
 
-        np.save(file_path+'data_train.npy',data_train)
-        np.save(file_path + 'labels_train.npy', labels_train)
-        np.save(file_path + 'data_test.npy', data_test)
-        np.save(file_path + 'labels_test.npy', labels_test)
+        np.save(file_path+'Data/'+'data_train.npy',data_train)
+        np.save(file_path+'Data/'+'labels_train.npy', labels_train)
+        np.save(file_path+'Data/'+'data_test.npy', data_test)
+        np.save(file_path+'Data/'+'labels_test.npy', labels_test)
 
-    elif my_dect["Load data"]:
-        data_train = np.load(file_path+'data_train.npy')
-        labels_train = np.load(file_path + 'labels_train.npy')
-        data_test = np.load(file_path + 'data_test.npy')
-        labels_test = np.load(file_path + 'labels_test.npy')
+    elif my_dict["Load data"]:
+        data_train = np.load(file_path+'Data/'+'data_train.npy')
+        labels_train = np.load(file_path+'Data/'+'labels_train.npy')
+        data_test = np.load(file_path+'Data/'+'data_test.npy')
+        labels_test = np.load(file_path+'Data/'+'labels_test.npy')
+    print("hi")
+    if my_dict["Train"]:
+        my_model = CNN(12, 12, 6)
+        my_model.weight_init(mean=0, std=0.02)
+
+        my_train(data_train, labels_train, my_model, num_epochs=train_prameters.epoch, batch_size=train_prameters.batch, file_path, checkpoint_bool=True)
+
 
 
 

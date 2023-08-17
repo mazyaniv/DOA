@@ -1,9 +1,10 @@
-def my_train(train,labels,P,model, num_epochs, batch_size, learning_rate, weight_decay=1e-9,
-          checkpoint_bool=False):
-  #define optimizer
+import torch.optim as optim
+import numpy as np
+import torch
+from functions_NN import *
 
+def my_train(train,labels,model, num_epochs, batch_size,file_path,checkpoint_bool=False):
   model.train()
-  # pos_weight = torch.ones([M])  # All weights are equal to 1
   optimizer = optim.Adam(model.parameters())
   for epoch in range(num_epochs):
     if epoch>1:
@@ -25,7 +26,8 @@ def my_train(train,labels,P,model, num_epochs, batch_size, learning_rate, weight
         loss = BCEWithLogitsLoss(model,z,s) # compute the total loss
         loss.backward()
         optimizer.step()
-  checkpoint_path = file_path+'SNR={}_snap={}_Q={}/'.format(SNR,snap,P)+'SNR='+str(SNR)+'_snap='+str(snap)+"_Q="+str(Q)
+
+  checkpoint_path = file_path+'Trained_Model/'
   if checkpoint_bool:
         torch.save(model.state_dict(), checkpoint_path)
   print("Finish")
