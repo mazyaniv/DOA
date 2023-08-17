@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 
 if __name__ == "__main__":
-    hi = np.zeros((2,2))
+    hi = np.zeros((3,2))
     np.save("hi",hi)
     # SNR_space = np.linspace(-5, 25, 7)
     # D = 2
