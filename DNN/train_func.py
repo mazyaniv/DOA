@@ -1,4 +1,4 @@
-def my_train(train,labels,Q,model, num_epochs, batch_size, learning_rate, weight_decay=1e-9,
+def my_train(train,labels,P,model, num_epochs, batch_size, learning_rate, weight_decay=1e-9,
           checkpoint_bool=False):
   #define optimizer
 
@@ -25,7 +25,7 @@ def my_train(train,labels,Q,model, num_epochs, batch_size, learning_rate, weight
         loss = BCEWithLogitsLoss(model,z,s) # compute the total loss
         loss.backward()
         optimizer.step()
-  checkpoint_path = file_path+'SNR={}_snap={}_Q={}/'.format(SNR,snap,Q)+'SNR='+str(SNR)+'_snap='+str(snap)+"_Q="+str(Q)
+  checkpoint_path = file_path+'SNR={}_snap={}_Q={}/'.format(SNR,snap,P)+'SNR='+str(SNR)+'_snap='+str(snap)+"_Q="+str(Q)
   if checkpoint_bool:
         torch.save(model.state_dict(), checkpoint_path)
   print("Finish")

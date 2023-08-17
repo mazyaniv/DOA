@@ -1,16 +1,10 @@
 import torch
 import numpy as np
 import math
-def Matrix(teta):
-    global M, D
-    teta = np.radians(teta)
-    B = np.zeros((M, D))
-    for j in range(D):
-        B[:, j] = np.exp(-1j * np.pi * np.arange(M) * np.sin(teta[j]))
-    return B
+from classes_NN import *
 
-def observ(teta, SNR, snap):
-    A = Matrix(teta)
+def observ(teta,M,D,SNR,snap):
+    A = Matrix_class(M, teta).matrix()
     real_s = np.random.normal(0, 1 / math.sqrt(2), (D, snap))
     im_s = np.random.normal(0, 1 / math.sqrt(2), (D, snap))
     s = real_s + 1j * im_s
@@ -23,9 +17,9 @@ def observ(teta, SNR, snap):
     x_a_samp = (A @ s_samp) + n_samp
     return x_a_samp
 
-def quantize_part(A,P):
+def quantize_part(A,P,thresh=0):
         mask = np.zeros(np.shape(A),dtype=complex)
-        mask[:P,:] = (1/math.sqrt(2))*(np.sign(A[:P,:].real-(thresh_real))+(1j*(np.sign(A[:P,:].imag-((thresh_im))))))
+        mask[:P,:] = (1/math.sqrt(2))*(np.sign(A[:P,:].real-(thresh))+(1j*(np.sign(A[:P,:].imag-((thresh))))))
         mask[P:,:] = A[P:,:]
         return mask
 
