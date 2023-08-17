@@ -1,13 +1,14 @@
 import numpy as np
 
 class prameters_class():
-    def __init__(self, M,P,D,teta_range,SNR,snapshot):
+    def __init__(self, M,P,D,teta_range,SNR,snapshot,C):
         self.M = M
         self.P = P
         self.D = D
         self.teta_range = teta_range
         self.SNR = SNR
         self.snap = snapshot
+        self.C = C
 class train_prameters():
     def __init__(self, N,test_size,batch,epoch,learning_rate, weight_decay=1e-9):
         self.N = N

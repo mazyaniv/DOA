@@ -1,8 +1,37 @@
 import torch
+import torch.nn as nn
 import numpy as np
 import math
 from classes_NN import *
 
+def generate_data(my_parameters,train_prameters,file_path):
+    data = np.zeros((my_parameters.D, train_prameters.N, my_parameters.M, my_parameters.M), dtype=np.complex128)
+    labels = np.zeros((train_prameters.N, my_parameters.D))
+    for i in range(0, train_prameters.N):
+        if my_parameters.D == 1:
+            teta = np.random.randint(my_parameters.teta_range[0], my_parameters.teta_range[1], size=my_parameters.D)
+        else:
+            while True:
+                teta = np.random.randint(my_parameters.teta_range[0], my_parameters.teta_range[1], size=my_parameters.D)
+                if teta[0] != teta[1]:
+                    break
+            teta = np.sort(teta)[::-1]
+        labels[i, :] = teta
+        Observ = quantize_part(observ(teta, my_parameters.M, my_parameters.D, my_parameters.SNR, my_parameters.snap),
+                               my_parameters.P)  # Quantize
+        R = np.cov(Observ)
+        data[0, i, :, :] = np.triu(R, k=1).real
+        data[1, i, :, :] = np.triu(R, k=1).imag
+
+    data_train = data[:, :-train_prameters.test_size, :, :]
+    labels_train = labels[:-train_prameters.test_size, :]
+    data_test = data[:, -train_prameters.test_size:, :, :]
+    labels_test = labels[-train_prameters.test_size:, :]
+
+    np.save(file_path + 'Data/' + 'data_train.npy', data_train)
+    np.save(file_path + 'Data/' + 'labels_train.npy', labels_train)
+    np.save(file_path + 'Data/' + 'data_test.npy', data_test)
+    np.save(file_path + 'Data/' + 'labels_test.npy', labels_test)
 def observ(teta,M,D,SNR,snap):
     A = Matrix_class(M, teta).matrix()
     real_s = np.random.normal(0, 1 / math.sqrt(2), (D, snap))
@@ -68,3 +97,27 @@ def MSE_loss(model,tensor1, tensor2):
     return nn.MSELoss()(z,s)
 # z,s = get_batch(data_train_vec[0], labels_train_vec[0], 0, 2)
 # print(BCEWithLogitsLoss(CNN(12,12,6),z,s))
+
+def test_model(model, data, labels,C):
+    # print("Q=",Q)
+    labels = labels.squeeze()
+    model.eval()
+    n = data.shape[1]
+    z = torch.tensor(data, dtype=torch.float32).transpose(0, 1)
+    with torch.no_grad():
+        z = model(z)
+        z = np.argsort(z.detach().numpy(), 1)[:, ::-1]
+        z = z[:, :labels.shape[1]].squeeze()
+        pred = np.sort(z, 1)[:, ::-1].squeeze()
+        equal_elements = np.sum(np.all(pred == labels, axis=1))
+        accuracy_percentage = equal_elements / n * 100.0
+
+        sub_vec_old = pred - labels
+        mask = np.logical_and(-C < np.min(sub_vec_old, axis=1), np.max(sub_vec_old, axis=1) < C)
+        sub_vec_new = sub_vec_old[mask]
+
+        RMSE = (np.sum(np.sum(np.power(sub_vec_new, 2), 1)) / (sub_vec_new.shape[0] * (pred.shape[1]))) ** 0.5
+        # print(f"Accuracy: {accuracy_percentage:.2f}%")
+        # print(f"RMSE : {RMSE:.2f}_Degrees,", "Number of relevant tests:",np.shape(sub_vec_new)[0])
+        # print("======")
+        return RMSE
