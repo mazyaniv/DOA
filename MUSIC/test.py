@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 if __name__ == "__main__":
     #SNR_space = np.linspace(-15, 15, 6)
     SNR = 0
-    snap_space = np.linspace(100, 1000, 7)
+    snap_space = np.linspace(100, 600, 5)
     #snap = 400
 
     N_a = [1,1,2,2]
