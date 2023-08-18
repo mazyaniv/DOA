@@ -14,7 +14,8 @@ if __name__ == "__main__":
     train_prameters = train_prameters(10000, 100, 100, 20, 0.001)
     my_dict = {"device":"CPU",
                "Generate new data": False,
-               "Train": False, "Test": True}
+               "Train": False,
+               "Test": True,"Plot": True}
 # ======================================================================================================================
     if my_dict["device"] == "Cuda":
         file_path = '/home/mazya/DNN/'
@@ -42,12 +43,13 @@ if __name__ == "__main__":
                                                  +f'trained_model_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.pth'))
                 Model.eval()
                 Error[i, j] = test_model(Model,my_data.data_test,my_data.labels_test,my_parameters.C)
+                fig = plt.figure(figsize=(10, 6))
 
-    fig = plt.figure(figsize=(10, 6))
-    for i in range(len(N_a)):
-        plt.plot(SNR_space, Error[:, i], label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
-    plt.title(f"RMSE for snap={my_parameters.snap}, M={my_parameters.M}, D={my_parameters.D}")
-    plt.ylabel("RMSE (Deg.)")
-    plt.xlabel("SNR [dB]")
-    plt.legend()
-    plt.show()
+    if my_dict["Plot"]:
+        for i in range(len(N_a)):
+            plt.plot(SNR_space, Error[:, i], label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
+        plt.title(f"RMSE for snap={my_parameters.snap}, M={my_parameters.M}, D={my_parameters.D}")
+        plt.ylabel("RMSE (Deg.)")
+        plt.xlabel("SNR [dB]")
+        plt.legend()
+        plt.show()
