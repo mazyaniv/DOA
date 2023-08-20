@@ -9,11 +9,11 @@ if __name__ == "__main__":
     #snap_space = np.linspace(100, 600, 5)
     snap = 400
 
-    N_a = [0,8,5]
-    N_q = [10,2,5]
+    N_a = [2,8,5]
+    N_q = [8,2,5]
     D = 2
     teta_range = [0, 60]
-    monte = 20
+    monte = 200
     C = 10  # Mask
     Error1 = np.zeros((len(SNR_space), len(N_a)))
     Error2 = np.zeros((len(SNR_space), len(N_a)))

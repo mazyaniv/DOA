@@ -6,7 +6,6 @@ from functions import covariance, quantize, observ
 from classes import Matrix_class
 
 def music_algorithm(pram,method=0):
-    N_a = pram.M-pram.N_q
     theta_range = np.radians(np.arange(pram.teta_range[0], pram.teta_range[1], 1))  # Convert angles to radians
     num_angles = len(theta_range)
     rho = pram.D * (10 ** (-pram.SNR / 10) + 1)
@@ -38,7 +37,7 @@ def music_algorithm(pram,method=0):
 
         elif method == 2:  #quantized_lin
             R[:pram.N_q, :pram.N_q] = ((rho * math.pi / 2) *
-                                       (np.subtract(R[:pram.N_q, :pram.N_q], 1 - (2 / math.pi) * np.identity(pram.M)))) # R_quantize
+                                       (np.subtract(R[:pram.N_q, :pram.N_q], 1 - (2 / math.pi) * np.identity(pram.N_q)))) # R_quantize
             R[pram.N_q:, :pram.N_q] = ((math.pi / 2) ** 0.5) * R[pram.N_q:, :pram.N_q]  # R_mixed
             R[:pram.N_q, pram.N_q:] = ((math.pi / 2) ** 0.5) * R[:pram.N_q, pram.N_q:]  # R_mixed
             R[pram.N_q:, pram.N_q:] = R[pram.N_q:, pram.N_q:]  # R_analog
@@ -64,7 +63,10 @@ def music_algorithm(pram,method=0):
         peaks = list(peaks)
         peaks.sort(key=lambda x: music_spectrum[x])
         pred = np.array(peaks[-pram.D:])
-        pred = np.sort(pred)[::-1]#np.subtract(np.sort(teta_vector), 90)
+        while True:
+            pred = np.sort(pred)[::-1]#np.subtract(np.sort(teta_vector), 90)
+            if pred.shape == teta_vector[i,:].shape:
+                break
         teta_vector[i,:] = pred
         # print("====")
         # print(pred)
