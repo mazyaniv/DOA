@@ -12,21 +12,17 @@ def music_algorithm(pram,method=0):
     labels = np.zeros((pram.monte, pram.D))
     teta_vector = np.zeros((pram.monte, pram.D))
     #print(teta_vector.shape)
-    for i in range(0, pram.monte): #Create labels
-        if pram.D == 1:
-            teta = np.random.randint(pram.teta_range[0], pram.teta_range[1], size=pram.D)
-        else:
-            while True:
-                teta = np.random.randint(pram.teta_range[0], pram.teta_range[1], size=pram.D)
-                if teta[0] != teta[1]:
-                    break
-            teta = np.sort(teta)[::-1]
-        labels[i, :] = teta
-
     for i in range(pram.monte):
         while True:
-            print("Back to start")
-
+            if pram.D == 1:
+                teta = np.random.randint(pram.teta_range[0], pram.teta_range[1], size=pram.D)
+            else:
+                while True:
+                    teta = np.random.randint(pram.teta_range[0], pram.teta_range[1], size=pram.D)
+                    if teta[0] != teta[1]:
+                        break
+                teta = np.sort(teta)[::-1]
+            labels[i, :] = teta
             A = Matrix_class(pram.M, labels[i, :]).matrix()
             my_vec = observ(pram.SNR, pram.snapshot, A)
             my_vec = quantize(my_vec, pram.N_q)
@@ -61,12 +57,10 @@ def music_algorithm(pram,method=0):
             pred = np.array(peaks[-pram.D:])
             pred = np.sort(pred)[::-1]#np.subtract(np.sort(teta_vector), 90)
 
-            print(pred)
 
             if pred.shape == teta_vector[i,:].shape:
                 break
 
-        print("====")
         teta_vector[i,:] = pred
 
     sub_vec_old = teta_vector - labels
@@ -78,26 +72,4 @@ def music_algorithm(pram,method=0):
     return RMSE #TODO modulo
 
 if __name__ == "__main__":
-    from classes import prameters_class
-    import numpy as np
-    from matplotlib import pyplot as plt
-
-    #print("Not main file")
-    SNR_space = np.linspace(-10, 10, 6)
-    # SNR = 0
-    # snap_space = np.linspace(100, 600, 5)
-    snap = 400
-
-    N_a = [2, 8, 5, 0]
-    N_q = [8, 2, 5, 10]
-    D = 2
-    teta_range = [0, 60]
-    monte = 200
-    C = 10  # Mask
-    Error1 = np.zeros((len(SNR_space), len(N_a)))
-    Error2 = np.zeros((len(SNR_space), len(N_a)))
-    Error3 = np.zeros((len(SNR_space), len(N_a)))
-    for i in range(len(SNR_space)):
-        for j in range(len(N_a)):
-            my_parameters = prameters_class(N_a[j] + N_q[j], N_q[j], D, teta_range, SNR_space[i], snap, monte, C)
-            Error1[i, j] = music_algorithm(my_parameters)
+    print("Not main file")
