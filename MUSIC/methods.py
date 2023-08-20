@@ -67,8 +67,6 @@ def music_algorithm(pram,method=0):
     mask = np.logical_and(-pram.C < np.min(sub_vec_old, axis=1), np.max(sub_vec_old, axis=1) < pram.C)
     sub_vec_new = sub_vec_old[mask]
     RMSE = ((np.sum(np.sum(np.power(sub_vec_new, 2), 1)) / (sub_vec_new.shape[0] * (teta_vector.shape[1]))) ** 0.5)
-    #print("Relevant tests:",sub_vec_new.shape[0])
-    print('RMSE = ', RMSE)
     return RMSE #TODO modulo
 
 if __name__ == "__main__":
