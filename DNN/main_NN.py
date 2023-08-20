@@ -13,9 +13,9 @@ if __name__ == "__main__":
     pram = {"snap":400, "teta_range":[0,60], "D":2, "C":10}
     train_prameters = train_prameters(50000, 200, 100, 40, 0.0001)
     my_dict = {"device":"Cuda",
-               "Generate new data": True,
-               "Train": True,
-               "Test": False,"Plot": False}
+               "Generate new data": False,
+               "Train": False,
+               "Test": True,"Plot": True}
 # ======================================================================================================================
     if my_dict["device"] == "Cuda":
         file_path = '/home/mazya/DNN/'
@@ -43,9 +43,9 @@ if __name__ == "__main__":
                                                  +f'trained_model_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.pth'))
                 Model.eval()
                 Error[i, j] = test_model(Model,my_data.data_test,my_data.labels_test,my_parameters.C)
-                fig = plt.figure(figsize=(10, 6))
 
     if my_dict["Plot"]:
+        fig = plt.figure(figsize=(10, 6))
         for i in range(len(N_a)):
             plt.plot(SNR_space, Error[:, i], label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
         plt.title(f"RMSE for snap={my_parameters.snap}, M={my_parameters.M}, D={my_parameters.D}")
