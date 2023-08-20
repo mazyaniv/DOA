@@ -6,6 +6,7 @@ from functions import covariance, quantize, observ
 from classes import Matrix_class
 
 def music_algorithm(pram,method=0):
+    N_a = pram.M-pram.N_q
     theta_range = np.radians(np.arange(pram.teta_range[0], pram.teta_range[1], 1))  # Convert angles to radians
     num_angles = len(theta_range)
     rho = pram.D * (10 ** (-pram.SNR / 10) + 1)
@@ -26,12 +27,23 @@ def music_algorithm(pram,method=0):
     for i in range(pram.monte):
         A = Matrix_class(pram.M, labels[i, :]).matrix()
         my_vec = observ(pram.SNR, pram.snapshot, A)
-        my_vec = quantize(my_vec, pram.P)
+        my_vec = quantize(my_vec, pram.N_q)
         R = covariance(my_vec, my_vec)
         if method == 1:  #quantized_sin
-            R = rho * (np.sin((math.pi / 2) * R.real) + 1j * np.sin((math.pi / 2) * R.imag))
+            R[:pram.N_q,:pram.N_q] = rho * (np.sin((math.pi / 2) * R.real)
+                                            + 1j * np.sin((math.pi / 2) * R.imag)) #R_quantize
+            R[pram.N_q:,:pram.N_q] = #R_mixed
+            R[:pram.N_q,pram.N_q:] = #R_mixed
+            R[pram.N_q:,pram.N_q:] = R[pram.N_q:,pram.N_q:] #R_analog
         elif method == 2:  #quantized_lin
             R = (rho * math.pi / 2) * (np.subtract(R, 1 - (2 / math.pi) * np.identity(pram.M)))
+
+        # def quantize(A, P, thresh_real=0, thresh_im=0):
+        #     mask = np.zeros(np.shape(A), dtype=complex)
+        #     mask[:P, :] = (1 / math.sqrt(2)) * (
+        #             np.sign(A[:P, :].real - (thresh_real)) + (1j * (np.sign(A[:P, :].imag - ((thresh_im))))))
+        #     mask[P:, :] = A[P:, :]
+        #     return mask
 
         eigvals, eigvecs = np.linalg.eig(R)
         sorted_indices = np.argsort(eigvals.real)[::-1]  # Sort eigenvalues in descending order

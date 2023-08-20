@@ -13,7 +13,7 @@ if __name__ == "__main__":
     N_q = [10,2,5]
     D = 2
     teta_range = [0, 60]
-    monte = 200
+    monte = 20
     C = 10  # Mask
     Error1 = np.zeros((len(SNR_space), len(N_a)))
     Error2 = np.zeros((len(SNR_space), len(N_a)))

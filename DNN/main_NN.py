@@ -35,7 +35,7 @@ if __name__ == "__main__":
             if my_dict["Train"]:
                 my_model = CNN(my_parameters)
                 my_model.weight_init(mean=0, std=0.02)
-                my_train(my_data, my_model,my_parameters, train_prameters, 'Trained_Model/',True)
+                my_train(my_data, my_model,my_parameters, train_prameters, file_path+'Trained_Model/',True)
 
             elif my_dict["Test"]:
                 Model = CNN(my_parameters)

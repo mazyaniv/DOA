@@ -1,9 +1,9 @@
 import numpy as np
 
 class prameters_class():
-    def __init__(self, M,P,D,teta_range,SNR,snapshot,monte,C):
+    def __init__(self, M,N_q,D,teta_range,SNR,snapshot,monte,C):
         self.M = M
-        self.P = P
+        self.N_q = N_q
         self.D = D
         self.teta_range = teta_range
         self.SNR = SNR
