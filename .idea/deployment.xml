@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="mazya@132.72.46.95:22 password" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="mazya@132.72.80.123:22 password" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="mazya@132.72.41.153:22 password">
         <serverdata>
@@ -38,6 +38,13 @@
         </serverdata>
       </paths>
       <paths name="mazya@132.72.66.176:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/mazya" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="mazya@132.72.80.123:22 password">
         <serverdata>
           <mappings>
             <mapping deploy="/home/mazya" local="$PROJECT_DIR$" />
