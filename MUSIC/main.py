@@ -13,17 +13,18 @@ if __name__ == "__main__":
     N_q = [8,2,5,10,0]
     D = 2
     teta_range = [0, 60]
-    monte = 150
+    monte = 1000
     C = 10  # Mask
     Error1 = np.zeros((len(SNR_space), len(N_a)))
     Error2 = np.zeros((len(SNR_space), len(N_a)))
-    #Error3 = np.zeros((len(SNR_space), len(N_a)))
     for i in range(len(SNR_space)):
         for j in range(len(N_a)):
             my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j],D,teta_range,SNR_space[i],snap,monte,C)
-            Error1[i,j] = music_algorithm(my_parameters)
-            Error2[i,j] = music_algorithm(my_parameters,1)
-            #Error3[i,j] = music_algorithm(my_parameters,2)
+            if j == len(N_a)-1:
+                Error1[i,j] = music_algorithm(my_parameters)
+            else:
+                Error1[i,j] = music_algorithm(my_parameters)
+                Error2[i,j] = music_algorithm(my_parameters,1)
 
     fig = plt.figure(figsize=(10, 6))
     colors = ['b', 'g', 'orange', 'black','red']
@@ -33,8 +34,8 @@ if __name__ == "__main__":
         else:
             style = 'solid'
         plt.plot(SNR_space, Error1[:,i],color = colors[i],linestyle=style, label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
-        plt.plot(SNR_space, Error2[:, i],color = colors[i],linestyle=style,marker='o', label=f'Analog={N_a[i]}, Quantize={N_q[i]}, Sin recon.')
-        #plt.plot(SNR_space, Error3[:, i],color = colors[i],linestyle=style, marker='v',label=f'Analog={N_a[i]}, Quantize={N_q[i]}, Lin recon.')
+        if i < len(N_a)-1:
+            plt.plot(SNR_space, Error2[:, i],color = colors[i],linestyle=style,marker='o', label=f'Analog={N_a[i]}, Quantize={N_q[i]}, Sin recon.')
     plt.title(f"RMSE for snap={my_parameters.snapshot}, M={my_parameters.M}, D={my_parameters.D}, monte={my_parameters.monte}")
     plt.ylabel("RMSE (Deg.)")
     plt.xlabel("SNR [dB]")
