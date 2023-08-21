@@ -11,10 +11,10 @@ if __name__ == "__main__":
     N_a = [0, 10, 5]
     N_q = [10, 0, 5]
     pram = {"snap":400, "teta_range":[0,60], "D":2, "C":10}
-    train_prameters = train_prameters(50000, 200, 100, 40, 0.0001)
-    my_dict = {"device":"Cuda",
-               "Generate new data": False,
-               "Train": False,
+    train_prameters = train_prameters(100, 20, 10, 2, 0.0001)
+    my_dict = {"device":"CPU",
+               "Generate new data": True,
+               "Train": True,
                "Test": True,"Plot": True}
 # ======================================================================================================================
     if my_dict["device"] == "Cuda":
@@ -33,12 +33,12 @@ if __name__ == "__main__":
             my_data = My_data(data_file_path,my_parameters)
 
             if my_dict["Train"]:
-                my_model = CNN(my_parameters)
+                my_model = LSTM(my_parameters)
                 my_model.weight_init(mean=0, std=0.02)
                 my_train(my_data, my_model,my_parameters, train_prameters, file_path+'Trained_Model/',True)
 
             elif my_dict["Test"]:
-                Model = CNN(my_parameters)
+                Model = LSTM(my_parameters)
                 Model.load_state_dict(torch.load(file_path+'Trained_Model/'
                                                  +f'trained_model_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.pth'))
                 Model.eval()

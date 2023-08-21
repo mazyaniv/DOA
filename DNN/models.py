@@ -53,9 +53,9 @@ class CNN(nn.Module):
       #x = self.sigmo(x)
       return x #torch.argmax(x,dim=1)
 
-class CNNLSTM(nn.Module):
+class LSTM(nn.Module):
     def __init__(self, param, n1=12, n3=6, kernel_size=3, padding_size=2, a=0.5):
-        super(CNNLSTM, self).__init__()
+        super(LSTM, self).__init__()
         self.kernel_size = kernel_size
         self.padding_size = padding_size
         self.n1 = n1
@@ -117,5 +117,5 @@ if __name__ == "__main__":
     x = torch.tensor(x, requires_grad=True,dtype=torch.float32).transpose(0, 1)
     x = x[0:4]
     my_parameters = prameters_class(10, 5, 2, 400, [0,60], 2, 10)
-    z = CNNLSTM(my_parameters)(x)
+    z = LSTM(my_parameters)(x)
     print(z.shape) #torch.Size([4, 61])
