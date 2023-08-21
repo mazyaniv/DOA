@@ -117,5 +117,5 @@ if __name__ == "__main__":
     x = torch.tensor(x, requires_grad=True,dtype=torch.float32).transpose(0, 1)
     x = x[0:4]
     my_parameters = prameters_class(10, 5, 2, 400, [0,60], 2, 10)
-    z = RNN(my_parameters)(x)
+    z = CNNLSTM(my_parameters)(x)
     print(z.shape) #torch.Size([4, 61])
