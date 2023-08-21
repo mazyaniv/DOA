@@ -26,7 +26,7 @@ if __name__ == "__main__":
                 Error1[i,j] = music_algorithm(my_parameters)
                 Error2[i,j] = music_algorithm(my_parameters,1)
 
-    fig = plt.figure(figsize=(10, 6))
+    fig = plt.figure(figsize=(12, 8))
     colors = ['b', 'g', 'orange', 'black','red']
     for i in range(len(N_a)):
         if i > len(N_a)-3:
@@ -36,10 +36,11 @@ if __name__ == "__main__":
         plt.plot(SNR_space, Error1[:,i],color = colors[i],linestyle=style, label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
         if i < len(N_a)-1:
             plt.plot(SNR_space, Error2[:, i],color = colors[i],linestyle=style,marker='o', label=f'Analog={N_a[i]}, Quantize={N_q[i]}, Sin recon.')
+    plt.grid()
     plt.title(f"RMSE for snap={my_parameters.snapshot}, M={my_parameters.M}, D={my_parameters.D}, monte={my_parameters.monte}")
     plt.ylabel("RMSE (Deg.)")
     plt.xlabel("SNR [dB]")
-    plt.legend()
+    plt.legend(loc='lower left', fontsize='small')
     plt.show()
 
 
