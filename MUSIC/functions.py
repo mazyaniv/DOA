@@ -13,7 +13,7 @@ def observ(SNR, snap, A):
     im_n = np.random.normal(0, (10 ** (-SNR / 20)) / math.sqrt(2), (M, snap))
     n = real_n + 1j * im_n
     n_samp = n.reshape(M, snap)
-    x_a_samp = (A @ s_samp) + n_samp
+    x_a_samp = (A@s_samp) + n_samp
     return x_a_samp
 
 def quantize(A, P, thresh_real=0, thresh_im=0):
