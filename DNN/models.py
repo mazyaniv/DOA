@@ -53,6 +53,10 @@ class CNN(nn.Module):
       #x = self.sigmo(x)
       return x #torch.argmax(x,dim=1)
 
+# self.RNN_block = nn.Sequential(
+#             nn.LSTM(input_size=self.embedding_dim//2, hidden_size=self.embedding_dim//2, dropout=0.3, bidirectional = False, batch_first=True)
+#         ) #torch.Size([batch_size, seq_len, embedding_dim]), lstm/ gru / rnn
+
 if __name__ == "__main__":
     file_path = 'C:/Users/Yaniv/PycharmProjects/DOA/DNN/Data/' #'/home/mazya/DNN/Data/'
     data_train = np.load(file_path + 'data_train.npy')
