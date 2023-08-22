@@ -59,8 +59,6 @@ if __name__ == "__main__":
             Y_ = cubic_interpolation_model(X_)
             plt.plot(X_, Y_, color=colors[i], linestyle=style,
                      label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
-            # plt.plot(SNR_space, Error[:, i], color=colors[i], linestyle=style,
-            #          label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
         plt.title(f"RMSE for snap={my_parameters.snap}, M={my_parameters.M}, D={my_parameters.D}")
         plt.grid()
         plt.ylabel("RMSE (Deg.)")
