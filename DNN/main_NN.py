@@ -5,9 +5,11 @@ from functions_NN import *
 from classes_NN import *
 import torch
 import numpy as np
+from scipy.interpolate import interp1d
+#/home/mazya/.conda/envs/yaniv/bin/python
 
 if __name__ == "__main__":
-    SNR_space = np.linspace(-5, 25, 8)
+    SNR_space = np.linspace(-5, 25, 8)#np.delete(np.linspace(-5, 25, 8), [4,6])
     N_a = [2, 8, 5, 0, 10]
     N_q = [8, 2, 5, 10, 0]
     pram = {"snap":400, "teta_range":[0,60], "D":2, "C":10}
@@ -46,10 +48,23 @@ if __name__ == "__main__":
 
     if my_dict["Plot"]:
         fig = plt.figure(figsize=(10, 6))
+        colors = ['b', 'g', 'orange', 'black', 'red']
         for i in range(len(N_a)):
-            plt.plot(SNR_space, Error[:, i], label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
+            if i > len(N_a) - 3:
+                style = 'dashed'
+            else:
+                style = 'solid'
+            cubic_interpolation_model = interp1d(SNR_space, Error[:, i], kind="slinear")
+            X_ = np.linspace(SNR_space.min(), SNR_space.max(), 500)
+            Y_ = cubic_interpolation_model(X_)
+            plt.plot(X_, Y_, color=colors[i], linestyle=style,
+                     label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
+            # plt.plot(SNR_space, Error[:, i], color=colors[i], linestyle=style,
+            #          label=f'Analog={N_a[i]}, Quantize={N_q[i]}')
         plt.title(f"RMSE for snap={my_parameters.snap}, M={my_parameters.M}, D={my_parameters.D}")
+        plt.grid()
         plt.ylabel("RMSE (Deg.)")
         plt.xlabel("SNR [dB]")
         plt.legend()
         plt.show()
+

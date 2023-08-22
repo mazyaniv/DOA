@@ -5,7 +5,7 @@ from functions_NN import *
 
 def my_train(data,model,parameters,train_pram,checkpoint_path,checkpoint_bool=False):
   model.train()
-  optimizer = optim.Adam(model.parameters())
+  optimizer = optim.Adam(model.parameters(),lr=train_pram.learning_rate, weight_decay=train_pram.weight_decay)
   for epoch in range(train_pram.epoch):
     if epoch>1:
       print(loss)
