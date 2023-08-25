@@ -9,7 +9,7 @@ class prameters_class():
         self.SNR = SNR
         self.snapshot = snapshot
         self.monte = monte
-        self.C = C
+        self.Reso = C
 class Matrix_class():
     def __init__(self, M, teta):
         self.teta = teta

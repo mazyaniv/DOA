@@ -22,7 +22,7 @@ def music_algorithm(pram,method=0):
             else:
                 while True:
                     teta = np.random.randint(pram.teta_range[0]+1, pram.teta_range[1]-1, size=pram.D)
-                    if abs(teta[0]-teta[1]) >> pram.C:
+                    if abs(teta[0]-teta[1]) >> pram.Reso:
                         break
                 teta = np.sort(teta)[::-1]
             labels[i, :] = teta
