@@ -13,13 +13,13 @@ if __name__ == "__main__":
     N_q = [8,2,5,10,0]
     D = 2
     teta_range = [0, 60]
-    monte = 1000
-    C = 20  # Mask
+    monte = 200
+    Res = 4  # Mask
     Error1 = np.zeros((len(SNR_space), len(N_a)))
     Error2 = np.zeros((len(SNR_space), len(N_a)))
     for i in range(len(SNR_space)):
         for j in range(len(N_a)):
-            my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j],D,teta_range,SNR_space[i],snap,monte,C)
+            my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j],D,teta_range,SNR_space[i],snap,monte,Res)
             yaniv = music_algorithm(my_parameters)
             if j == len(N_a)-1:
                 Error1[i,j] = music_algorithm(my_parameters)

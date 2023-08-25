@@ -65,11 +65,6 @@ def music_algorithm(pram,method=0):
             peaks.sort(key=lambda x: music_spectrum[x])
             pred = np.array(peaks[-pram.D:])
             pred = np.sort(pred)[::-1]#np.subtract(np.sort(teta_vector), 90)
-            plt.close()
-            plt.figure()
-            plt.plot(np.degrees(theta_range), music_spectrum)
-            plt.show()
-
 
             if pred.shape == teta_vector[i,:].shape:
                 break
@@ -77,10 +72,10 @@ def music_algorithm(pram,method=0):
         teta_vector[i,:] = pred
 
     sub_vec = teta_vector - labels
-    print("real value:", labels)
-    print("estimator:", teta_vector)
-    print("sub:", sub_vec)
-    print("============")
+    # print("real value:", labels)
+    # print("estimator:", teta_vector)
+    # print("sub:", sub_vec)
+    # print("============")
     RMSE = ((np.sum(np.sum(np.power(sub_vec, 2), 1)) / (sub_vec.shape[0] * (teta_vector.shape[1]))) ** 0.5)
     return RMSE #TODO modulo
 
