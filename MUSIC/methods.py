@@ -3,7 +3,9 @@ import math
 import scipy.signal as ss
 from numpy import linalg as LA
 from functions import covariance, quantize, observ
-from classes import Matrix_class
+from classes import Matrix_class, prameters_class
+from matplotlib import pyplot as plt
+
 
 def music_algorithm(pram,method=0):
     theta_range = np.radians(np.arange(pram.teta_range[0], pram.teta_range[1], 1))  # Convert angles to radians
@@ -15,18 +17,25 @@ def music_algorithm(pram,method=0):
     for i in range(pram.monte):
         while True:
             if pram.D == 1:
-                teta = np.random.randint(pram.teta_range[0], pram.teta_range[1], size=pram.D)
+                teta = np.random.randint(pram.teta_range[0]+1, pram.teta_range[1]-1, size=pram.D) #ss.find_peaks
+                # doesnt find limit points
             else:
                 while True:
-                    teta = np.random.randint(pram.teta_range[0], pram.teta_range[1], size=pram.D)
-                    if teta[0] != teta[1]:
+                    teta = np.random.randint(pram.teta_range[0]+1, pram.teta_range[1]-1, size=pram.D)
+                    if abs(teta[0]-teta[1]) >> pram.C:
                         break
                 teta = np.sort(teta)[::-1]
             labels[i, :] = teta
             A = Matrix_class(pram.M, labels[i, :]).matrix()
             my_vec = observ(pram.SNR, pram.snapshot, A)
+            # print(my_vec)
+            # print("=======")
             my_vec = quantize(my_vec, pram.N_q)
-            R = covariance(my_vec, my_vec)
+            R = np.cov(my_vec) #covariance(my_vec, my_vec)
+            # print(my_vec)
+            # print("=======")
+            # print(R)
+            # print("=======")
             if method == 1:  #quantized_sin
                 R[:pram.N_q,:pram.N_q] = rho * (np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].real)
                                                 + 1j * np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].imag)) #R_quantize
@@ -56,6 +65,10 @@ def music_algorithm(pram,method=0):
             peaks.sort(key=lambda x: music_spectrum[x])
             pred = np.array(peaks[-pram.D:])
             pred = np.sort(pred)[::-1]#np.subtract(np.sort(teta_vector), 90)
+            plt.close()
+            plt.figure()
+            plt.plot(np.degrees(theta_range), music_spectrum)
+            plt.show()
 
 
             if pred.shape == teta_vector[i,:].shape:
@@ -63,11 +76,24 @@ def music_algorithm(pram,method=0):
 
         teta_vector[i,:] = pred
 
-    sub_vec_old = teta_vector - labels
-    mask = np.logical_and(-pram.C < np.min(sub_vec_old, axis=1), np.max(sub_vec_old, axis=1) < pram.C)
-    sub_vec_new = sub_vec_old[mask]
-    RMSE = ((np.sum(np.sum(np.power(sub_vec_new, 2), 1)) / (sub_vec_new.shape[0] * (teta_vector.shape[1]))) ** 0.5)
+    sub_vec = teta_vector - labels
+    print("real value:", labels)
+    print("estimator:", teta_vector)
+    print("sub:", sub_vec)
+    print("============")
+    RMSE = ((np.sum(np.sum(np.power(sub_vec, 2), 1)) / (sub_vec.shape[0] * (teta_vector.shape[1]))) ** 0.5)
     return RMSE #TODO modulo
 
 if __name__ == "__main__":
-    print("Not main file")
+    SNR = 0
+    snap = 100
+
+    N_a = 0
+    N_q = 10
+    D = 2
+    teta_range = [0, 60]
+    monte = 3
+    C = 5  # Mask
+    my_parameters = prameters_class(N_a+N_q, N_q, D, teta_range, SNR, snap, monte, C)
+    yaniv = music_algorithm(my_parameters)
+    print(yaniv)
