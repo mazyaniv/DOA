@@ -13,6 +13,7 @@ def music_algorithm(pram,method=0):
     rho = pram.D * (10 ** (-pram.SNR / 10) + 1)
     labels = np.zeros((pram.monte, pram.D))
     teta_vector = np.zeros((pram.monte, pram.D))
+    En_vector = np.zeros((pram.monte, pram.M, pram.M-pram.D),dtype=complex)
     #print(teta_vector.shape)
     for i in range(pram.monte):
         while True:
@@ -59,6 +60,8 @@ def music_algorithm(pram,method=0):
             # print(eigvecs_sorted)
 
             En = eigvecs_sorted[:, pram.D:]
+            En_vector[i,:,:] = En
+
             music_spectrum = np.zeros(num_angles)
             for idx, theta in enumerate(theta_range):
                 steering_vector = np.exp(-1j * np.pi * np.arange(pram.M) * np.sin(theta))
@@ -71,25 +74,36 @@ def music_algorithm(pram,method=0):
             pred = np.sort(pred)[::-1]#np.subtract(np.sort(teta_vector), 90)
             if pred.shape == teta_vector[i,:].shape:
                 break
-        teta_vector[i,:] = pred
+        teta_vector[i,:] = pred+pram.teta_range[0]
+    En = np.mean(En_vector, 0)
+    # LA.norm(cov_matrix, "fro")
     sub_vec = teta_vector - labels
     # print("real value:", labels)
     # print("estimator:", teta_vector)
     # print("sub:", sub_vec)
     # print("============")
+
     RMSE = ((np.sum(np.sum(np.power(sub_vec, 2), 1)) / (sub_vec.shape[0] * (teta_vector.shape[1]))) ** 0.5)
-    return RMSE #TODO modulo
+    #print("RMSE:", RMSE)
+    return RMSE, En #TODO modulo
 
 if __name__ == "__main__":
-    SNR = 0
+    SNR = -1
     snap = 400
     D = 2
     teta_range = [0, 60]
-    monte = 1
+    monte = 1000
     C = 5  # Res
 
-    N_a = [2]#[0,2,5,8,10]
-    N_q = [8]#[10,8,5,2,0]
+    N_a = [0,2,5,8,10]
+    N_q = [10,8,5,2,0]
+    me = np.zeros((len(N_a),10, 8),dtype=complex)
     for i in range(len(N_a)):
         my_parameters = prameters_class(N_a[i]+N_q[i],N_q[i],D,teta_range,SNR,snap,monte,C)
-        yaniv = music_algorithm(my_parameters)
+        yaniv, me[i,:,:] = music_algorithm(my_parameters)
+
+    print(LA.norm(me[4,:,:]-me[4,:,:], "fro"))
+    print(LA.norm(me[4,:,:]-me[3,:,:], "fro"))
+    print(LA.norm(me[4, :, :]-me[2, :, :], "fro"))
+    print(LA.norm(me[4, :, :]-me[1, :, :], "fro"))
+    print(LA.norm(me[4, :, :]-me[0, :, :], "fro"))
