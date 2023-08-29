@@ -53,8 +53,12 @@ def music_algorithm(pram,method=0):
             eigvals, eigvecs = np.linalg.eig(R)
             sorted_indices = np.argsort(eigvals.real)[::-1]  # Sort eigenvalues in descending order
             eigvecs_sorted = eigvecs[:, sorted_indices]
-            En = eigvecs_sorted[:, pram.D:]
+            # print("N_a:", pram.M-pram.N_q,"N_q:", pram.N_q)
+            # print(eigvals.real[sorted_indices])
+            # print("============")
+            # print(eigvecs_sorted)
 
+            En = eigvecs_sorted[:, pram.D:]
             music_spectrum = np.zeros(num_angles)
             for idx, theta in enumerate(theta_range):
                 steering_vector = np.exp(-1j * np.pi * np.arange(pram.M) * np.sin(theta))
@@ -65,12 +69,9 @@ def music_algorithm(pram,method=0):
             peaks.sort(key=lambda x: music_spectrum[x])
             pred = np.array(peaks[-pram.D:])
             pred = np.sort(pred)[::-1]#np.subtract(np.sort(teta_vector), 90)
-
             if pred.shape == teta_vector[i,:].shape:
                 break
-
         teta_vector[i,:] = pred
-
     sub_vec = teta_vector - labels
     # print("real value:", labels)
     # print("estimator:", teta_vector)
@@ -81,14 +82,14 @@ def music_algorithm(pram,method=0):
 
 if __name__ == "__main__":
     SNR = 0
-    snap = 100
-
-    N_a = 0
-    N_q = 10
+    snap = 400
     D = 2
     teta_range = [0, 60]
-    monte = 3
-    C = 5  # Mask
-    my_parameters = prameters_class(N_a+N_q, N_q, D, teta_range, SNR, snap, monte, C)
-    yaniv = music_algorithm(my_parameters)
-    print(yaniv)
+    monte = 1
+    C = 5  # Res
+
+    N_a = [2]#[0,2,5,8,10]
+    N_q = [8]#[10,8,5,2,0]
+    for i in range(len(N_a)):
+        my_parameters = prameters_class(N_a[i]+N_q[i],N_q[i],D,teta_range,SNR,snap,monte,C)
+        yaniv = music_algorithm(my_parameters)
