@@ -92,7 +92,7 @@ if __name__ == "__main__":
     snap = 400
     D = 2
     teta_range = [0, 60]
-    monte = 1000
+    monte = 500
     C = 5  # Res
 
     N_a = [0,2,5,8,10]
@@ -102,8 +102,13 @@ if __name__ == "__main__":
         my_parameters = prameters_class(N_a[i]+N_q[i],N_q[i],D,teta_range,SNR,snap,monte,C)
         yaniv, me[i,:,:] = music_algorithm(my_parameters)
 
-    print(LA.norm(me[4,:,:]-me[4,:,:], "fro"))
-    print(LA.norm(me[4,:,:]-me[3,:,:], "fro"))
-    print(LA.norm(me[4, :, :]-me[2, :, :], "fro"))
-    print(LA.norm(me[4, :, :]-me[1, :, :], "fro"))
-    print(LA.norm(me[4, :, :]-me[0, :, :], "fro"))
+    # print(LA.norm(me[4,:,:]-me[3,:,:], "fro"))
+    # print(LA.norm(me[4, :, :]-me[2, :, :], "fro"))
+    # print(LA.norm(me[4, :, :]-me[1, :, :], "fro"))
+    # print(LA.norm(me[4, :, :]-me[0, :, :], "fro"))
+    print(LA.norm(me[4, :, :], "fro"))
+    print(LA.norm(me[3, :, :], "fro"))
+    print(LA.norm(me[2, :, :], "fro"))
+    print(LA.norm(me[1, :, :], "fro"))
+    print(LA.norm(me[0, :, :], "fro"))
+
