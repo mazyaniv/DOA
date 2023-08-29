@@ -4,7 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 if __name__ == "__main__":
-    SNR_space = np.linspace(-10, 10, 6)
+    SNR_space = np.linspace(-2, 7, 6)
     # SNR = 0
     # snap_space = np.linspace(100, 600, 5)
     snap = 400
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     plt.title(f"RMSE for snap={my_parameters.snapshot}, M={my_parameters.M}, D={my_parameters.D}, monte={my_parameters.monte}, Res={my_parameters.Reso}")
     plt.ylabel("RMSE (Deg.)")
     plt.xlabel("SNR [dB]")
-    plt.legend(loc='lower left', fontsize='small')
+    plt.legend(loc='upper right', fontsize='small')
     plt.show()
 
 
