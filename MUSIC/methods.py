@@ -75,7 +75,8 @@ def music_algorithm(pram,method=0):
             if pred.shape == teta_vector[i,:].shape:
                 break
         teta_vector[i,:] = pred+pram.teta_range[0]
-    En = np.mean(En_vector, 0)
+    #En = np.mean(En_vector, 0)
+    #print(LA.norm(En, "fro"))
     # LA.norm(cov_matrix, "fro")
     sub_vec = teta_vector - labels
     # print("real value:", labels)
@@ -85,7 +86,7 @@ def music_algorithm(pram,method=0):
 
     RMSE = ((np.sum(np.sum(np.power(sub_vec, 2), 1)) / (sub_vec.shape[0] * (teta_vector.shape[1]))) ** 0.5)
     #print("RMSE:", RMSE)
-    return RMSE, En #TODO modulo
+    return RMSE #TODO modulo
 
 if __name__ == "__main__":
     SNR = -1
@@ -100,15 +101,5 @@ if __name__ == "__main__":
     me = np.zeros((len(N_a),10, 8),dtype=complex)
     for i in range(len(N_a)):
         my_parameters = prameters_class(N_a[i]+N_q[i],N_q[i],D,teta_range,SNR,snap,monte,C)
-        yaniv, me[i,:,:] = music_algorithm(my_parameters)
-
-    # print(LA.norm(me[4,:,:]-me[3,:,:], "fro"))
-    # print(LA.norm(me[4, :, :]-me[2, :, :], "fro"))
-    # print(LA.norm(me[4, :, :]-me[1, :, :], "fro"))
-    # print(LA.norm(me[4, :, :]-me[0, :, :], "fro"))
-    print(LA.norm(me[4, :, :], "fro"))
-    print(LA.norm(me[3, :, :], "fro"))
-    print(LA.norm(me[2, :, :], "fro"))
-    print(LA.norm(me[1, :, :], "fro"))
-    print(LA.norm(me[0, :, :], "fro"))
-
+        music_algorithm(my_parameters)
+        music_algorithm(my_parameters,1)

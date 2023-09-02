@@ -30,6 +30,13 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="mazya@132.72.64.142:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/mazya" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="mazya@132.72.66.157:22 password">
         <serverdata>
           <mappings>
