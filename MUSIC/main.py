@@ -4,15 +4,15 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 if __name__ == "__main__":
-    SNR_space = np.linspace(-5, 10, 6)
+    SNR_space = np.linspace(-5, 10, 5)
     # SNR = 0
     # snap_space = np.linspace(100, 600, 5)
-    snap = 400
+    snap = 200
     N_a = [0,1,10]
     N_q = [10,9,0]
     D = 2
-    teta_range = [0, 60]
-    monte = 500
+    teta_range = [-60, 60]
+    monte = 300
     Res = 2
     Error1 = np.zeros((len(SNR_space), len(N_a)))
     Error2 = np.zeros((len(SNR_space), len(N_a)))
@@ -41,6 +41,7 @@ if __name__ == "__main__":
         #     plt.plot(SNR_space, Error2[:, i],color = colors[i],linestyle='dashed', label=f'Quantize={N_q[i]}, Analog={N_a[i]}, Sin recon.')
     plt.grid()
     plt.title(f"RMSE for snap={my_parameters.snapshot}, M={my_parameters.M}, D={my_parameters.D}, monte={my_parameters.monte}, Res={my_parameters.Reso}")
+    # plt.yscale('log')
     plt.ylabel("RMSE (Deg.)")
     plt.xlabel("SNR [dB]")
     plt.legend(loc='upper right', fontsize='small')
