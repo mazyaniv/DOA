@@ -7,8 +7,8 @@ from classes import Matrix_class, prameters_class
 from matplotlib import pyplot as plt
 
 
-def music_algorithm(pram,method=0):
-    theta_range = np.radians(np.arange(pram.teta_range[0], pram.teta_range[1], 1))  # Convert angles to radians
+def music_algorithm(pram,delta,method=0):
+    theta_range = np.radians(np.arange(pram.teta_range[0], pram.teta_range[1], delta))  # Convert angles to radians
     num_angles = len(theta_range)
     rho = pram.D * (10 ** (-pram.SNR / 10) + 1)
     labels = np.zeros((pram.monte, pram.D))
@@ -71,6 +71,8 @@ def music_algorithm(pram,method=0):
             pred2 = covariance_matrix(num_angles, theta_range, pram, R2)
             if pred1.shape == teta_vector1[i,:].shape and pred2.shape == teta_vector1[i,:].shape:
                 break
+        # print(pred1*delta+pram.teta_range[0])
+        # print(labels)
         teta_vector1[i,:] = pred1+pram.teta_range[0]
         teta_vector2[i, :] = pred2 + pram.teta_range[0]
     sub_vec1 = teta_vector1 - labels
@@ -85,13 +87,12 @@ if __name__ == "__main__":
     snap = 400
     D = 2
     teta_range = [-60, 60]
-    monte = 1
-    Res = 5
+    monte = 100
+    Res = 2
 
-    N_a = [1, 0]#, 10]
-    N_q = [0, 5]#, 0]
+    N_a = [0, 0]
+    N_q = [10, 5]
     me = np.zeros((len(N_q),10, 8),dtype=complex)
     for i in range(len(N_q)):
         my_parameters = prameters_class(N_a[i]+N_q[i],N_q[i],D,teta_range,SNR,snap,monte,Res)
-        music_algorithm(my_parameters)
-        # music_algorithm(my_parameters,1)
+        music_algorithm(my_parameters,0.125)
