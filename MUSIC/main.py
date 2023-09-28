@@ -12,8 +12,8 @@ if __name__ == "__main__":
     N_a = [0,1,10]
     N_q = [10,9,0]
     teta_range = [-60, 60]
-    monte = 10
-    delta = 5 #Minimum gap between two determenistic angles
+    monte = 300
+    delta = 1 #Minimum gap between two determenistic angles
     Res = 0.5
     Error1 = np.zeros((len(SNR_space), len(N_a)))
     Error2 = np.zeros((len(SNR_space), len(N_a)))
