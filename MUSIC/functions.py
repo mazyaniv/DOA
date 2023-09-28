@@ -60,3 +60,9 @@ def covariance_matrix(num_angles,theta_range,pram,R):
     pred = np.array(peaks[-pram.D:])
     pred = np.sort(pred)[::-1]
     return pred
+    # elif method == 2:  #quantized_lin
+    #     R[:pram.N_q, :pram.N_q] = ((rho * math.pi / 2) *
+    #                                (np.subtract(R[:pram.N_q, :pram.N_q], 1 - (2 / math.pi) * np.identity(pram.N_q)))) # R_quantize
+    #     R[pram.N_q:, :pram.N_q] = ((math.pi*rho/2) ** 0.5) * R[pram.N_q:, :pram.N_q]  # R_mixed
+    #     R[:pram.N_q, pram.N_q:] = ((math.pi*rho/2) ** 0.5) * R[:pram.N_q, pram.N_q:]  # R_mixed
+    #     R[pram.N_q:, pram.N_q:] = R[pram.N_q:, pram.N_q:]  # R_analog
