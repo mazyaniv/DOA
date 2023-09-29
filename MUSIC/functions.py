@@ -99,6 +99,18 @@ def root_music(pram,R):
     pred = np.sort(pred)[::-1]
     return pred
 
+def esprit(pram,R):
+    eigvals, eigvecs = np.linalg.eig(R)
+    sorted_indices = np.argsort(eigvals.real)[::-1]  # Sort eigenvalues in descending order
+    eigvecs_sorted = eigvecs[:, sorted_indices]
+    Es = eigvecs_sorted[:, :pram.D]
+    S1 = Es[1:,:]
+    S2 = Es[:-1,:]
+    P = np.linalg.inv(S1.conj().transpose()@S1)@S1.conj().transpose()@S2 #LS
+    eigvals, eigvecs = np.linalg.eig(P)
+    pred = np.degrees(np.arcsin(np.angle(eigvals) / math.pi))
+    pred = np.sort(pred)[::-1]
+    return pred
 
 
 
