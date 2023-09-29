@@ -8,16 +8,15 @@ if __name__ == "__main__":
     N_a = [0, 1, 10]
     N_q = [10, 9, 0]
     SNR_space = np.linspace(-10, 10, 4)
-    # SNR = 0
-    # snap_space = np.linspace(100, 600, 5)
     snap = 200
-
+    # snap_space = np.linspace(100, 600, 5)
+    # SNR = 0
     D = 2
     teta_range = [-60, 60]
     monte = 10
     delta = 1 #Minimum gap between two determenistic angles
     Res = 0.5
-    method_dict = {'MUSIC': 0, 'Root-MUSIC': 1}
+    method_dict = {'MUSIC': 1, 'Root-MUSIC': 0, 'ESPRIT': 0}
 
     Error1 = np.zeros((len(SNR_space), len(N_a)))
     Error2 = np.zeros((len(SNR_space), len(N_a)))

@@ -40,16 +40,11 @@ def general(pram):
                 break
         teta_vector1[i,:] = pred1
         teta_vector2[i, :] = pred2
-        print(labels[i,:])
-        print(pred1)
-        print(pred2)
-        print("=====================================")
     sub_vec1 = teta_vector1 - labels
     sub_vec2 = teta_vector2 - labels
     RMSE1 = ((np.sum(np.sum(np.power(sub_vec1, 2), 1)) / (sub_vec1.shape[0] * (teta_vector1.shape[1]))) ** 0.5)
     RMSE2 = ((np.sum(np.sum(np.power(sub_vec2, 2), 1)) / (sub_vec2.shape[0] * (teta_vector2.shape[1]))) ** 0.5)
     return RMSE1, RMSE2 #TODO modulo
-
 def detect(pram):
     teta = [20+pram.delta, 20]
     count = 0
