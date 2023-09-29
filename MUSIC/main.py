@@ -4,17 +4,18 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 if __name__ == "__main__":
-    SNR_space = np.linspace(-10, 10, 4)
+    N_a = [0, 1, 10]
+    N_q = [10, 9, 0]
+    D = 2
+    SNR_space = np.linspace(-5, 10, 4)
+    snap = 500
     # SNR = 0
     # snap_space = np.linspace(100, 600, 5)
-    snap = 200
-    D = 2
-    N_a = [0,1,10]
-    N_q = [10,9,0]
     teta_range = [-60, 60]
-    monte = 300
+    monte = 400
     delta = 1 #Minimum gap between two determenistic angles
-    Res = 0.5
+    Res = 0.25
+
     Error1 = np.zeros((len(SNR_space), len(N_a)))
     Error2 = np.zeros((len(SNR_space), len(N_a)))
     for i in range(len(SNR_space)):
