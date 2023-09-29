@@ -7,16 +7,16 @@ from functions import get_key_by_value
 if __name__ == "__main__":
     N_a = [0, 1, 10]
     N_q = [10, 9, 0]
+    D = 2
     SNR_space = np.linspace(-10, 10, 4)
-    snap = 200
+    snap = 300
     # snap_space = np.linspace(100, 600, 5)
     # SNR = 0
-    D = 2
     teta_range = [-60, 60]
-    monte = 10
+    monte = 200
     delta = 1 #Minimum gap between two determenistic angles
-    Res = 0.5
-    method_dict = {'MUSIC': 1, 'Root-MUSIC': 0, 'ESPRIT': 0}
+    Res = 0.0625
+    method_dict = {'MUSIC': 0, 'Root-MUSIC': 0, 'ESPRIT': 1}
 
     Error1 = np.zeros((len(SNR_space), len(N_a)))
     Error2 = np.zeros((len(SNR_space), len(N_a)))
