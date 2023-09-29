@@ -2,7 +2,10 @@ import numpy as np
 import math
 import scipy.signal as ss
 
-
+def get_key_by_value(dictionary, target_value):
+    for key, value in dictionary.items():
+        if value == target_value:
+            return key
 def observ(SNR, snap, A):
     M = A.shape[0]
     D = A.shape[1]

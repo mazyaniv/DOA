@@ -1,7 +1,7 @@
 import numpy as np
 
 class prameters_class():
-    def __init__(self, M,N_q,D,teta_range,SNR,snapshot,monte,delta,Res):
+    def __init__(self, M,N_q,SNR,snapshot,D,teta_range,monte,delta,Res,dictio):
         self.M = M
         self.N_q = N_q
         self.D = D
@@ -11,6 +11,7 @@ class prameters_class():
         self.monte = monte
         self.delta = delta
         self.Res = Res
+        self.dictio = dictio
 class Matrix_class():
     def __init__(self, M, teta):
         self.teta = teta

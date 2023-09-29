@@ -27,9 +27,12 @@ def general(pram):
             R2[pram.N_q:,:pram.N_q] = ((math.pi*rho/2)**0.5)*R[pram.N_q:,:pram.N_q]#R_mixed
             R2[:pram.N_q,pram.N_q:] = ((math.pi*rho/2)**0.5)*R[:pram.N_q,pram.N_q:]#R_mixed
             R2[pram.N_q:,pram.N_q:] = R[pram.N_q:,pram.N_q:] #R_analog
-
-            pred1 = root_music(pram, R)
-            pred2 = root_music(pram, R2)
+            if pram.dictio['MUSIC'] == 1:
+                pred1 = music(pram, R)
+                pred2 = music(pram, R2)
+            elif pram.dictio['Root-MUSIC'] == 1:
+                pred1 = root_music(pram, R)
+                pred2 = root_music(pram, R2)
             if pred1.shape == teta_vector1[i,:].shape and pred2.shape == teta_vector1[i,:].shape:
                 break
         teta_vector1[i,:] = pred1
