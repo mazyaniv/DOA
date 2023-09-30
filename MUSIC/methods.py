@@ -47,7 +47,8 @@ def general(pram):
     return RMSE1, RMSE2 #TODO modulo
 def detect(pram):
     teta = [20+pram.delta, 20]
-    count = 0
+    count1 = 0
+    count2 = 0
     label = np.array(teta)
     rho = pram.D * (10 ** (-pram.SNR / 10) + 1)
     teta_vector1 = np.zeros((pram.monte, pram.D))
@@ -65,13 +66,20 @@ def detect(pram):
             R2[pram.N_q:,pram.N_q:] = R[pram.N_q:,pram.N_q:] #R_analog
             if pram.dictio['MUSIC'] == 1:
                 pred1 = music(pram, R2)
+                pred2 = music(pram, R2)
             elif pram.dictio['Root-MUSIC'] == 1:
                 pred1 = root_music(pram, R)
-            if pred1.shape == teta_vector1[i,:].shape:
+                pred2 = root_music(pram, R2)
+            elif pram.dictio['ESPRIT'] == 1:
+                pred1 = esprit(pram, R)
+                pred2 = esprit(pram, R2)
+            if pred1.shape == teta_vector1[i,:].shape and pred2.shape == teta_vector1[i,:].shape:
                 break
         if (abs(pred1-label)<pram.delta/2).all():
-            count += 1
-    return count/pram.monte
+            count1 += 1
+        if (abs(pred2 - label) < pram.delta / 2).all():
+            count2 += 1
+    return count1/pram.monte, count2/pram.monte
 if __name__ == "__main__":
     N_a = 10  # [0, 0]
     N_q = 0  # [10, 5]
