@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 
 
 def general(pram):
-    rho = pram.D * (10 ** (-pram.SNR / 10) + 1)
+    rho = pram.D*(10**(pram.SNR / 10))+1#pram.D * (10 ** (-pram.SNR / 10)+1)
     labels = np.zeros((pram.monte, pram.D))
     teta_vector1 = np.zeros((pram.monte, pram.D))
     teta_vector2 = np.zeros((pram.monte, pram.D))
@@ -21,9 +21,18 @@ def general(pram):
             my_vec = observ(pram.SNR, pram.snapshot, A)
             my_vec = quantize(my_vec, pram.N_q)
             R = np.cov(my_vec) #covariance(my_vec, my_vec)
+
+            R1 = np.zeros(R.shape, dtype=complex)
+            R1[:pram.N_q, :pram.N_q] = rho*((math.pi / 2) *
+                                       (np.subtract(R[:pram.N_q, :pram.N_q],
+                                                    (1 - (2 / math.pi)) * np.identity(pram.N_q)))) # R_quantize_lin
+            R1[pram.N_q:, :pram.N_q] = ((math.pi*rho/2)**0.5)*R[pram.N_q:, :pram.N_q]  # R_mixed
+            R1[:pram.N_q, pram.N_q:] = ((math.pi*rho/2)**0.5)*R[:pram.N_q, pram.N_q:]  # R_mixed
+            R1[pram.N_q:, pram.N_q:] = R[pram.N_q:, pram.N_q:]  # R_analog
+
             R2 = np.zeros(R.shape, dtype=complex)
-            R2[:pram.N_q,:pram.N_q] = rho * (np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].real)
-                                            + 1j * np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].imag)) #R_quantize
+            R2[:pram.N_q,:pram.N_q] = rho*(np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].real)
+                                            + 1j * np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].imag)) #R_quantize_sin
             R2[pram.N_q:,:pram.N_q] = ((math.pi*rho/2)**0.5)*R[pram.N_q:,:pram.N_q]#R_mixed
             R2[:pram.N_q,pram.N_q:] = ((math.pi*rho/2)**0.5)*R[:pram.N_q,pram.N_q:]#R_mixed
             R2[pram.N_q:,pram.N_q:] = R[pram.N_q:,pram.N_q:] #R_analog
@@ -50,7 +59,7 @@ def detect(pram):
     count1 = 0
     count2 = 0
     label = np.array(teta)
-    rho = pram.D * (10 ** (-pram.SNR / 10) + 1)
+    rho  = pram.D*(10**(pram.SNR / 10))+1#pram.D * (10 ** (-pram.SNR / 10) + 1)
     teta_vector1 = np.zeros((pram.monte, pram.D))
     for i in range(pram.monte):
         while True:
@@ -80,11 +89,33 @@ def detect(pram):
         if (abs(pred2 - label) < pram.delta / 2).all():
             count2 += 1
     return count1/pram.monte, count2/pram.monte
+def norm(pram):
+    rho = pram.D*(10**(pram.SNR / 10))+1#pram.D * (10 ** (-pram.SNR / 10)+1)
+    norm_vec_R = np.zeros(pram.monte)
+    norm_vec_R_a = np.zeros(pram.monte)
+    norm_vec_R2 = np.zeros(pram.monte)
+    for i in range(pram.monte):
+        teta = angles_generate(pram)
+        A = Matrix_class(pram.M, teta).matrix()
+        my_vec = observ(pram.SNR, pram.snapshot, A)
+        R_a = np.cov(my_vec) #covariance(my_vec, my_vec)
+        my_vec = quantize(my_vec, pram.N_q)
+        R = np.cov(my_vec) #covariance(my_vec, my_vec)
+
+        R2 = np.zeros(R.shape, dtype=complex)
+        R2[:pram.N_q,:pram.N_q] = rho*(np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].real)
+                                        + 1j * np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].imag)) #R_quantize_sin
+        R2[pram.N_q:,:pram.N_q] = ((math.pi*rho/2)**0.5)*R[pram.N_q:,:pram.N_q]#R_mixed
+        R2[:pram.N_q,pram.N_q:] = ((math.pi*rho/2)**0.5)*R[:pram.N_q,pram.N_q:]#R_mixed
+        R2[pram.N_q:,pram.N_q:] = R[pram.N_q:,pram.N_q:] #R_analog
+        norm_vec_R_a[i], norm_vec_R[i], norm_vec_R2[i] = LA.norm(R_a, "fro"), LA.norm(R, "fro"), LA.norm(R2, "fro")
+    return np.mean(norm_vec_R_a), np.mean(norm_vec_R), np.mean(norm_vec_R2)
+
 if __name__ == "__main__":
-    N_a = 10  # [0, 0]
-    N_q = 0  # [10, 5]
-    SNR = 0
-    snap = 200
+    N_a = 0  # [0, 0]
+    N_q = 2  # [10, 5]
+    SNR = -10
+    snap = 1000
     D = 2
     teta_range = [-60, 60]
     monte = 1
@@ -94,13 +125,3 @@ if __name__ == "__main__":
 
     my_parameters = prameters_class(N_a + N_q, N_q, SNR, snap, D, teta_range, monte, delta, Res, method_dict)
     RMSE1, RMSE2 = general(my_parameters)
-
-    # delta_space = np.linspace(3, 6, 10)
-    # RMSE = np.zeros(len(delta_space))
-    # for j in range(len(delta_space)):
-    #     my_parameters = prameters_class(N_a+N_q,N_q,SNR,snap,D,teta_range,monte,delta_space[j],Res,method_dict)
-    #     RMSE[j] = detect(my_parameters)
-    #     # RMSE1, RMSE2 = general(my_parameters)
-    # plt.plot(delta_space, RMSE)
-    # plt.grid()
-    # plt.show()
