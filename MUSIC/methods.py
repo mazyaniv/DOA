@@ -59,7 +59,7 @@ def detect(pram):
     count1 = 0
     count2 = 0
     label = np.array(teta)
-    rho  = pram.D*(10**(pram.SNR / 10))+1#pram.D * (10 ** (-pram.SNR / 10) + 1)
+    rho = pram.D*(10**(pram.SNR / 10))+1#pram.D * (10 ** (-pram.SNR / 10) + 1)
     teta_vector1 = np.zeros((pram.monte, pram.D))
     for i in range(pram.monte):
         while True:

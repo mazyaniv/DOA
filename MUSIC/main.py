@@ -9,16 +9,16 @@ if __name__ == "__main__":
     N_q = [10, 9, 0]
     D = 2
     teta_range = [-60, 60]
-    # SNR = 0
-    SNR_space = np.linspace(-10, 10, 8)
+    SNR = 10
+    # SNR_space = np.linspace(-10, 10, 8)
     snap = 300
     # snap_space = np.linspace(100, 1000, 10)
-    monte = 200
+    monte = 10000
     delta = 2 #Minimal gap between two determenistic angles
     Res = 0.005
     method_dict = {'MUSIC': 0, 'Root-MUSIC': 0, 'ESPRIT': 1}
-    # delta_space = np.linspace(0.8, 6, 15)
-    relevant_space = SNR_space #TODO
+    delta_space = np.linspace(0.8, 5, 15)
+    relevant_space = delta_space #TODO
 
 
     Error1 = np.zeros((len(relevant_space), len(N_q)))
@@ -26,9 +26,9 @@ if __name__ == "__main__":
     Error3 = np.zeros((len(relevant_space), len(N_q)))
     for i in range(len(relevant_space)):
         for j in range(len(N_q)):
-            my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j],relevant_space[i],snap,D,teta_range,monte,delta,
+            my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j],SNR,snap,D,teta_range,monte,relevant_space[i],
                                             Res,method_dict) #TODO
-            Error1[i, j], Error2[i, j] = general(my_parameters) #TODO
+            Error1[i, j], Error2[i, j] = detect(my_parameters) #TODO
             # Error1[i, j], Error2[i, j],Error3[i,j]  = norm(my_parameters)
     fig = plt.figure(figsize=(12, 8))
     colors = ['red', 'b', 'black']
@@ -47,13 +47,13 @@ if __name__ == "__main__":
     value = get_key_by_value(method_dict, 1)
     plt.grid()
     plt.title(f"RMSE for Snap={my_parameters.snapshot}, Monte={my_parameters.monte}, Res={my_parameters.Res}, "
-              f"Delta={my_parameters.delta}, Method: {value}") #TODO
+              f"SNR={my_parameters.SNR}, Method: {value}") #TODO
     plt.ylabel("RMSE")
-    plt.xlabel("snapshots") #TODO
-    # plt.ylabel("$|A|_F$")
-    # plt.xlabel("SNR[dB]")
-    # plt.ylabel("Resolution Probability")
-    # plt.xlabel("$\Delta^\degree$")
+    # plt.xlabel("snapshots") #TODO
+    plt.ylabel("$|A|_F$")
+    plt.xlabel("SNR[dB]")
+    plt.ylabel("Resolution Probability")
+    plt.xlabel("$\Delta^\degree$")
     plt.legend(loc='upper right', fontsize='small')
     plt.show()
 
