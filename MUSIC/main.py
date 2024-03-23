@@ -10,7 +10,7 @@ if __name__ == "__main__":
     D = 2
     teta_range = [-60, 60]
     # SNR = 10
-    SNR_space = np.linspace(-5, 10, 8)
+    SNR_space = np.linspace(-5, 10, 15)
     snap = 1000
     # snap_space = np.linspace(100, 1000, 10)
     monte = 1000
