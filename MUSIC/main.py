@@ -13,7 +13,7 @@ if __name__ == "__main__":
     SNR_space = np.linspace(-5, 10, 8)
     snap = 1000
     # snap_space = np.linspace(100, 1000, 10)
-    monte = 500
+    monte = 1000
     delta = 2 #Minimal gap between two determenistic angles
     Res = 1
     method_dict = {'MUSIC': 0, 'Root-MUSIC': 0, 'ESPRIT': 1}
