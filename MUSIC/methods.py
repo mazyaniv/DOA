@@ -2,7 +2,7 @@ import numpy as np
 import math
 import scipy.signal as ss
 from numpy import linalg as LA
-from functions import quantize, observ,angles_generate,music,root_music,esprit
+from functions import quantize, observ,angles_generate,music,root_music,esprit,covariance
 from classes import Matrix_class, prameters_class
 from matplotlib import pyplot as plt
 
