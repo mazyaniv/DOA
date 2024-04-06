@@ -5,17 +5,17 @@ from matplotlib import pyplot as plt
 from functions import get_key_by_value
 
 if __name__ == "__main__":
-    N_a = [0, 1, 10]
-    N_q = [10, 9, 0]
+    N_a = [0, 2, 20]
+    N_q = [20, 18, 0]
     D = 2
     teta_range = [-60, 60]
     # SNR = 0
     SNR_space = np.linspace(-10, 10, 8)
-    snap = 300
+    snap = 150
     # snap_space = np.linspace(100, 1000, 10)
     monte = 200
-    delta = 2 #Minimal gap between two determenistic angles
-    Res = 0.005
+    delta = 5 #Minimal gap between two determenistic angles
+    Res = 0.5
     method_dict = {'MUSIC': 0, 'Root-MUSIC': 0, 'ESPRIT': 1}
     # delta_space = np.linspace(0.8, 6, 15)
     relevant_space = SNR_space #TODO
