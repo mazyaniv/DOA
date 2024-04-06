@@ -6,13 +6,25 @@ def get_key_by_value(dictionary, target_value):
     for key, value in dictionary.items():
         if value == target_value:
             return key
+
+def generate_qpsk_symbols(K,D):
+    random_symbols = np.random.randint(0, 4, (K,D))
+    qpsk_constellation = np.array([1+1j, -1+1j, -1-1j, 1-1j]) / np.sqrt(2)
+    qpsk_symbols = qpsk_constellation[random_symbols]
+    return qpsk_symbols.T
+
 def observ(SNR, snap, A):
     M = A.shape[0]
     D = A.shape[1]
-    real_s = np.random.normal(0, 1 / math.sqrt(2), (D, snap))
-    im_s = np.random.normal(0, 1 / math.sqrt(2), (D, snap))
-    s = real_s + 1j * im_s
-    s_samp = s.reshape(D, snap)
+
+    # sample_rate = 1e6
+    # t = np.arange(snap)/sample_rate  #time vector
+    # f_tone = np.array([0.02e6, 0.08e6])
+    # s = np.exp(2j * np.pi * f_tone.reshape(2,1) * t)
+    # real_s = np.random.normal(1, 1 / math.sqrt(2), (D, snap))
+    # im_s = np.random.normal(1, 1 / math.sqrt(2), (D, snap))
+    # s = real_s + 1j * im_s
+    s_samp = generate_qpsk_symbols(snap,D)#s.reshape(D, snap)
 
     real_n = np.random.normal(0, (10 ** (-SNR / 20)) / math.sqrt(2), (M, snap))
     im_n = np.random.normal(0, (10 ** (-SNR / 20)) / math.sqrt(2), (M, snap))
@@ -48,7 +60,7 @@ def angles_generate(pram):
     while True:
         range_array = np.arange(pram.teta_range[0], pram.teta_range[1], pram.Res)
         teta = np.random.choice(range_array[1:-1], size=pram.D, replace=False)
-        if abs(teta[0] - teta[1]) > pram.delta:
+        if pram.D == 1 or abs(teta[0] - teta[1]) > pram.delta:
             break
     return np.sort(teta)[::-1]
 

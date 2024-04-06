@@ -2,7 +2,7 @@ import numpy as np
 import math
 import scipy.signal as ss
 from numpy import linalg as LA
-from functions import quantize, observ,angles_generate,music,root_music,esprit
+from functions import quantize, observ,angles_generate,music,root_music,esprit,covariance
 from classes import Matrix_class, prameters_class
 from matplotlib import pyplot as plt
 
@@ -59,7 +59,7 @@ def detect(pram):
     count1 = 0
     count2 = 0
     label = np.array(teta)
-    rho  = pram.D*(10**(pram.SNR / 10))+1#pram.D * (10 ** (-pram.SNR / 10) + 1)
+    rho = pram.D*(10**(pram.SNR / 10))+1#pram.D * (10 ** (-pram.SNR / 10) + 1)
     teta_vector1 = np.zeros((pram.monte, pram.D))
     for i in range(pram.monte):
         while True:
