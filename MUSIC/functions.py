@@ -17,15 +17,16 @@ def observ(SNR, snap, A):
     M = A.shape[0]
     D = A.shape[1]
 
-    # sample_rate = 1e6
-    # t = np.arange(snap)/sample_rate  #time vector
-    # f_tone = np.array([0.02e6, 0.08e6])
-    # s = np.exp(2j * np.pi * f_tone.reshape(2,1) * t)
+    sample_rate = 1e6
+    t = np.arange(snap)/sample_rate  #time vector
+    f_tone = np.array([0.02e6, 0.08e6])
+    s = np.exp(2j * np.pi * f_tone.reshape(2,1) * t)
     # real_s = np.random.normal(1, 1 / math.sqrt(2), (D, snap))
     # im_s = np.random.normal(1, 1 / math.sqrt(2), (D, snap))
     # s = real_s + 1j * im_s
-    s_samp = generate_qpsk_symbols(snap,D)#s.reshape(D, snap)
 
+    # s_samp = generate_qpsk_symbols(snap,D)#s.reshape(D, snap)
+    s_samp = s.reshape(D, snap)
     real_n = np.random.normal(0, (10 ** (-SNR / 20)) / math.sqrt(2), (M, snap))
     im_n = np.random.normal(0, (10 ** (-SNR / 20)) / math.sqrt(2), (M, snap))
     n = real_n + 1j * im_n
