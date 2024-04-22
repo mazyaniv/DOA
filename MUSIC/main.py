@@ -5,37 +5,39 @@ from matplotlib import pyplot as plt
 from functions import get_key_by_value
 
 if __name__ == "__main__":
-    N_a = [0]#, 2, 20]
-    N_q = [20]#, 18, 0]
+    N_a = [0, 1, 10]
+    N_q = [10, 9, 0]
     D = 2
     teta_range = [-60, 60]
     # SNR = 0
-    SNR_space = np.linspace(-10, 10, 8)
-    snap = 150
+    SNR_space = np.linspace(-5, 10, 12)
+    snap = 500
     # snap_space = np.linspace(100, 1000, 10)
-    monte = 200
-    delta = 5 #Minimal gap between two determenistic angles
-    Res = 0.5
-    method_dict = {'MUSIC': 1, 'Root-MUSIC': 0, 'ESPRIT': 0}
+    monte = 500
+    delta = 10 #Minimal gap between two determenistic angles
+    Res = 0.1
+    method_dict = {'MUSIC': 0, 'Root-MUSIC': 0, 'ESPRIT': 1}
     # delta_space = np.linspace(0.8, 6, 15)
     relevant_space = SNR_space #TODO
 
 
+    Error = np.zeros((len(relevant_space), len(N_q)))
     Error1 = np.zeros((len(relevant_space), len(N_q)))
     Error2 = np.zeros((len(relevant_space), len(N_q)))
-    Error3 = np.zeros((len(relevant_space), len(N_q)))
     for i in range(len(relevant_space)):
         for j in range(len(N_q)):
             my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j],relevant_space[i],snap,D,teta_range,monte,delta,
                                             Res,method_dict) #TODO
-            Error1[i, j], Error2[i, j] = general(my_parameters) #TODO
+            Error[i, j], Error1[i, j], Error2[i,j] = general(my_parameters) #TODO
             # Error1[i, j], Error2[i, j],Error3[i,j]  = norm(my_parameters)
     fig = plt.figure(figsize=(12, 8))
     colors = ['red', 'b', 'black']
     for i in range(len(N_q)):#TODO
-        plt.plot(relevant_space, Error1[:,i],linestyle='solid',color=colors[i], label=f'N_a={N_a[i]},N_q={N_q[i]}')
+        plt.plot(relevant_space, Error[:,i],linestyle='solid',color=colors[i], label=f'N_a={N_a[i]},N_q={N_q[i]}')
         if i < len(N_q)-1:
-            plt.plot(relevant_space, Error2[:, i], linestyle='dashed',color=colors[i],
+            plt.plot(relevant_space, Error1[:, i], linestyle='-.',marker="o",color=colors[i],
+                     label=f'N_a={N_a[i]},N_q={N_q[i]}, Gaussian filter')
+            plt.plot(relevant_space, Error2[:, i], linestyle='dashed', marker="x", color=colors[i],
                      label=f'N_a={N_a[i]},N_q={N_q[i]}, Sin recon.')
     # for i in range(len(N_q)):
     #     # plt.plot(relevant_space, Error1[:,i],linestyle='solid',color=colors[i], label=f'N_a={N_a[i]},N_q={N_q[i]}, R_analog')
@@ -45,15 +47,19 @@ if __name__ == "__main__":
     #              label=f'N_a={N_a[i]},N_q={N_q[i]}, $\hat R$')
 
     value = get_key_by_value(method_dict, 1)
-    plt.grid()
-    plt.title(f"RMSE for Snap={my_parameters.snapshot}, Monte={my_parameters.monte}, Res={my_parameters.Res}, "
-              f"Delta={my_parameters.delta}, Method: {value}") #TODO
-    plt.ylabel("RMSE")
-    plt.xlabel("snapshots") #TODO
-    # plt.ylabel("$|A|_F$")
-    # plt.xlabel("SNR[dB]")
-    # plt.ylabel("Resolution Probability")
+    ax = plt.gca()
+    ax.set_xticks(np.arange(relevant_space[0], relevant_space[-1], 0.25), minor=True)
+    ax.grid(which='major', alpha=0.5)
+    ax.grid(which='minor', linestyle="--", alpha=0.25)
+    # plt.title(f"RMSE for Snap={my_parameters.snapshot}, Monte={my_parameters.monte}, "
+    #           f"Method: {value}") #TODO
+    # plt.xlabel("snapshots") #TODO
     # plt.xlabel("$\Delta^\degree$")
+    plt.xlabel("$SNR_{[dB]}$")
+    plt.ylabel("RMSE")
+    # plt.ylabel("$|A|_F$")
+    # plt.ylabel("Resolution Probability")
+    plt.yscale('log')
     plt.legend(loc='upper right', fontsize='small')
     plt.show()
 
