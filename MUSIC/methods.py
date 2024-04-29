@@ -3,20 +3,20 @@ import math
 from scipy.ndimage import gaussian_filter
 import scipy.signal as ss
 from numpy import linalg as LA
-from functions import quantize, observ,angles_generate,music,root_music,esprit,covariance
+from functions import quantize, observ,angles_generate,music,root_music,esprit,covariance,spatial_smoothing
 from classes import Matrix_class, prameters_class
 from matplotlib import pyplot as plt
 
 
 def general(pram):
-    rho = pram.D*(10**(pram.SNR / 10))+1#pram.D * (10 ** (-pram.SNR / 10)+1)
+    rho = pram.D+10**(-pram.SNR/10)#pram.D*(10**(pram.SNR / 10))+1
     labels = np.zeros((pram.monte, pram.D))
     teta_vector = np.zeros((pram.monte, pram.D))
     teta_vector1 = np.zeros((pram.monte, pram.D))
     teta_vector2 = np.zeros((pram.monte, pram.D))
     for i in range(pram.monte):
         while True:
-            teta = np.array([5,-5])#angles_generate(pram)
+            teta = angles_generate(pram)#np.array([5,-5])
             labels[i, :] = teta
 
             A = Matrix_class(pram.M, labels[i, :]).matrix()
@@ -25,36 +25,37 @@ def general(pram):
             R = np.cov(my_vec) #covariance(my_vec, my_vec)
             R1 = np.zeros(R.shape, dtype=complex)
 
-            # R1[:pram.N_q, :pram.N_q] = rho*((math.pi / 2) *
-            #                            (np.subtract(R[:pram.N_q, :pram.N_q],
-            #                                         (1 - (2 / math.pi)) * np.identity(pram.N_q)))) # R_quantize_lin
-            # R1[pram.N_q:, :pram.N_q] = ((math.pi*rho/2)**0.5)*R[pram.N_q:, :pram.N_q]  # R_mixed
-            # R1[:pram.N_q, pram.N_q:] = ((math.pi*rho/2)**0.5)*R[:pram.N_q, pram.N_q:]  # R_mixed
-            # R1[pram.N_q:, pram.N_q:] = R[pram.N_q:, pram.N_q:]  # R_analog
-            R1[:pram.N_q, :pram.N_q] = gaussian_filter(rho * (np.sin((math.pi / 2) * R[:pram.N_q, :pram.N_q].real)
-                                              + 1j * np.sin((math.pi / 2) * R[:pram.N_q, :pram.N_q].imag)),sigma=0.5)  # R_quantize_sin
-            R1[pram.N_q:, :pram.N_q] = ((math.pi * rho / 2) ** 0.5) * R[pram.N_q:, :pram.N_q]  # R_mixed
-            R1[:pram.N_q, pram.N_q:] = ((math.pi * rho / 2) ** 0.5) * R[:pram.N_q, pram.N_q:]  # R_mixed
+            R1[:pram.N_q, :pram.N_q] = rho*((math.pi / 2) *(np.subtract(R[:pram.N_q, :pram.N_q],
+                                                    (1 - (2 / math.pi)) * np.identity(pram.N_q)))) # R_quantize_lin
+            R1[pram.N_q:, :pram.N_q] = ((math.pi*rho/2)**0.5)*R[pram.N_q:, :pram.N_q]  # R_mixed
+            R1[:pram.N_q, pram.N_q:] = ((math.pi*rho/2)**0.5)*R[:pram.N_q, pram.N_q:]  # R_mixed
             R1[pram.N_q:, pram.N_q:] = R[pram.N_q:, pram.N_q:]  # R_analog
+            # R1[:pram.N_q, :pram.N_q] = rho * (np.sin((math.pi / 2) * R[:pram.N_q, :pram.N_q].real)
+            #                                   + 1j * np.sin((math.pi / 2) * R[:pram.N_q, :pram.N_q].imag))  # R_quantize_sin
+            # R1[pram.N_q:, :pram.N_q] = ((math.pi * rho / 2) ** 0.5) * R[pram.N_q:, :pram.N_q]  # R_mixed
+            # R1[:pram.N_q, pram.N_q:] = ((math.pi * rho / 2) ** 0.5) * R[:pram.N_q, pram.N_q:]  # R_mixed
+            # R1[pram.N_q:, pram.N_q:] = R[pram.N_q:, pram.N_q:]  # R_analog
 
-            R2 = np.zeros(R.shape, dtype=complex)
-            R2[:pram.N_q,:pram.N_q] = rho*(np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].real)
-                                            + 1j * np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].imag)) #R_quantize_sin
-            R2[pram.N_q:,:pram.N_q] = ((math.pi*rho/2)**0.5)*R[pram.N_q:,:pram.N_q]#R_mixed
-            R2[:pram.N_q,pram.N_q:] = ((math.pi*rho/2)**0.5)*R[:pram.N_q,pram.N_q:]#R_mixed
-            R2[pram.N_q:,pram.N_q:] = R[pram.N_q:,pram.N_q:] #R_analog
+            # R2 = np.zeros(R.shape, dtype=complex)
+            # R2[:pram.N_q,:pram.N_q] = rho*(np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].real)
+            #                                 + 1j * np.sin((math.pi / 2) * R[:pram.N_q,:pram.N_q].imag)) #R_quantize_sin
+            # R2[pram.N_q:,:pram.N_q] = ((math.pi*rho/2)**0.5)*R[pram.N_q:,:pram.N_q]#R_mixed
+            # R2[:pram.N_q,pram.N_q:] = ((math.pi*rho/2)**0.5)*R[:pram.N_q,pram.N_q:]#R_mixed
+            # R2[pram.N_q:,pram.N_q:] = R[pram.N_q:,pram.N_q:] #R_analog
 
-            if pram.dictio['MUSIC'] == 1:
-                pred1 = music(pram, R)
-                pred2 = music(pram, R2)
-            elif pram.dictio['Root-MUSIC'] == 1:
-                pred1 = root_music(pram, R)
-                pred2 = root_music(pram, R2)
-            elif pram.dictio['ESPRIT'] == 1:
+            if pram.dictio['ESPRIT'] == 1:
                 pred = esprit(pram, R)
                 pred1 = esprit(pram, R1)
-                pred2 = esprit(pram, R2)
-            if pred1.shape == teta_vector1[i,:].shape and pred2.shape == teta_vector1[i,:].shape and pred.shape == teta_vector1[i,:].shape:
+                pred2 = esprit(pram, spatial_smoothing(R,4))
+            elif pram.dictio['MUSIC'] == 1:
+                pred = music(pram, R)
+                pred1 = music(pram, R1)
+                pred2 = music(pram, gaussian_filter(R, sigma=0.5))
+            elif pram.dictio['Root-MUSIC'] == 1:
+                pred = root_music(pram, R)
+                pred1 = root_music(pram, R1)
+                pred2 = root_music(pram, gaussian_filter(R,sigma=0.5))
+            if pred.shape == teta_vector1[i,:].shape and pred1.shape == teta_vector1[i,:].shape and pred2.shape == teta_vector1[i,:].shape:
                 break
         teta_vector[i,:] = pred
         teta_vector1[i,:] = pred1
@@ -65,7 +66,7 @@ def general(pram):
     RMSE = ((np.sum(np.sum(np.power(sub_vec, 2), 1)) / (sub_vec.shape[0] * (teta_vector.shape[1]))) ** 0.5)
     RMSE1 = ((np.sum(np.sum(np.power(sub_vec1, 2), 1)) / (sub_vec1.shape[0] * (teta_vector1.shape[1]))) ** 0.5)
     RMSE2 = ((np.sum(np.sum(np.power(sub_vec2, 2), 1)) / (sub_vec2.shape[0] * (teta_vector2.shape[1]))) ** 0.5)
-    return RMSE,RMSE1, RMSE2 #TODO modulo
+    return RMSE,RMSE1,RMSE2
 def detect(pram):
     teta = [20+pram.delta, 20]
     count1 = 0

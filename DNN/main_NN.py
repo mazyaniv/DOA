@@ -10,14 +10,14 @@ from scipy.interpolate import interp1d
 
 if __name__ == "__main__":
     SNR_space = np.linspace(-5, 25, 8)#np.delete(np.linspace(-5, 25, 8), [4,6])
-    N_a = [2, 8, 5, 0, 10]
-    N_q = [8, 2, 5, 10, 0]
+    N_a = [10]
+    N_q = [0]
     pram = {"snap":400, "teta_range":[0,60], "D":2, "C":10}
-    train_prameters = train_prameters(50000, 200, 100, 40, 0.0001)
-    my_dict = {"device":"Cuda",
-               "Generate new data": False,
+    train_prameters = train_prameters(100, 10, 5, 5, 0.001)
+    my_dict = {"device":"CPU",
+               "Generate new data": True,
                "Train": False,
-               "Test": True,"Plot": True}
+               "Test": False,"Plot": False}
 # ======================================================================================================================
     if my_dict["device"] == "Cuda":
         file_path = '/home/mazya/DNN/'

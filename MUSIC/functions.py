@@ -1,6 +1,8 @@
 import numpy as np
 import math
 import scipy.signal as ss
+from matplotlib import pyplot as plt
+from classes import prameters_class, Matrix_class
 
 def get_key_by_value(dictionary, target_value):
     for key, value in dictionary.items():
@@ -17,18 +19,19 @@ def observ(SNR, snap, A):
     M = A.shape[0]
     D = A.shape[1]
 
-    # sample_rate = 1e6
-    # t = np.arange(snap)/sample_rate  #time vector
-    # f_tone = np.array([0.02e6, 0.08e6])
-    # s = np.exp(2j * np.pi * f_tone.reshape(2,1) * t)
+    # f_tone = 1e9
+    # f_tone_vec = f_tone * np.ones(D)
+    # sample_rate = f_tone  # nayquist rate
+    # t = np.arange(snap) / sample_rate  # time vector
+    # s = np.exp(1j * 2 * np.pi * f_tone_vec.reshape(D, 1) * t.reshape(1, snap))
     real_s = np.random.normal(0, 1 / math.sqrt(2), (D, snap))
     im_s = np.random.normal(0, 1 / math.sqrt(2), (D, snap))
     s = real_s + 1j * im_s
 
     # s = generate_qpsk_symbols(snap,D)
     s_samp = s.reshape(D, snap)
-    real_n = np.random.normal(0, math.sqrt((10 ** (-SNR / 20))) / math.sqrt(2), (M, snap))
-    im_n = np.random.normal(0, math.sqrt((10 ** (-SNR / 20))) / math.sqrt(2), (M, snap))
+    real_n = np.random.normal(0, math.sqrt((10 ** (-SNR / 10))) / math.sqrt(2), (M, snap))
+    im_n = np.random.normal(0, math.sqrt((10 ** (-SNR / 10))) / math.sqrt(2), (M, snap))
     n = real_n + 1j * im_n
     n_samp = n.reshape(M, snap)
     x_a_samp = (A@s_samp) + n_samp
@@ -77,7 +80,7 @@ def music(pram,R):
         steering_vector = np.exp(-1j * np.pi * np.arange(pram.M) * np.sin(theta))
         music_spectrum[idx] = 1 / np.linalg.norm(En.conj().T @ steering_vector)
     # plt.plot(np.degrees(theta_range), music_spectrum)
-    # plt.title(f"N_a={pram.M-pram.N_q}, N_q={pram.N_q},theta={teta},method={method}")
+    # # plt.title(f"N_a={pram.M-pram.N_q}, N_q={pram.N_q},theta={teta},method={method}")
     # plt.show()
 
     peaks, _ = ss.find_peaks(music_spectrum)
@@ -119,6 +122,42 @@ def esprit(pram,R):
     pred = np.sort(pred)[::-1]
     return pred
 
+from scipy.signal import convolve2d
 
+def spatial_smoothing(covariance_matrix, kernel_size):
+    """
+    Apply spatial smoothing to an image using convolution with a square kernel.
 
+    Parameters:
+    - image: numpy array, input image.
+    - kernel_size: int, size of the square kernel.
+
+    Returns:
+    - smoothed_image: numpy array, smoothed image.
+    """
+
+    kernel = np.ones((kernel_size, kernel_size)) / (kernel_size**2)
+    smoothed_image = convolve2d(covariance_matrix, kernel, mode='same', boundary='wrap')
+
+    return smoothed_image
+
+if __name__ == "__main__":
+    N_a = 0  # [0, 0]
+    N_q = 10  # [10, 5]
+    SNR = 0
+    snap = 1000
+    D = 2
+    teta_range = [-60, 60]
+    monte = 1
+    delta = 10
+    Res = 0.1
+    method_dict = {'MUSIC': 1, 'Root-MUSIC': 0, 'ESPRIT': 0}
+    my_parameters = prameters_class(N_a + N_q, N_q, SNR, snap, D, teta_range, monte, delta, Res, method_dict)
+    # rho = pram.D + 10 ** (-pram.SNR / 10)  # pram.D*(10**(pram.SNR / 10))+1
+    teta = angles_generate(my_parameters)  # np.array([5,-5])
+    A = Matrix_class(my_parameters.M, teta).matrix()
+    my_vec = observ(my_parameters.SNR, my_parameters.snapshot, A)
+    my_vec = quantize(my_vec, my_parameters.N_q)
+    R = np.cov(my_vec)
+    music(my_parameters,spatial_smoothing(R,4))
 

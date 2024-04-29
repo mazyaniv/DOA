@@ -3,15 +3,18 @@ from classes import prameters_class
 import numpy as np
 from matplotlib import pyplot as plt
 from functions import get_key_by_value
+from classes import Matrix_class
+from functions import observ, quantize
+import numpy.linalg as LA
 
 if __name__ == "__main__":
-    N_a = [0, 1, 10]
-    N_q = [10, 9, 0]
+    N_a = [0,1,10]
+    N_q = [10,9,0]
     D = 2
     teta_range = [-60, 60]
     # SNR = 0
-    SNR_space = np.linspace(-5, 10, 12)
-    snap = 500
+    SNR_space = np.linspace(-10, 10, 15)
+    snap = [1100,900,500]
     # snap_space = np.linspace(100, 1000, 10)
     monte = 500
     delta = 10 #Minimal gap between two determenistic angles
@@ -26,19 +29,19 @@ if __name__ == "__main__":
     Error2 = np.zeros((len(relevant_space), len(N_q)))
     for i in range(len(relevant_space)):
         for j in range(len(N_q)):
-            my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j],relevant_space[i],snap,D,teta_range,monte,delta,
+            my_parameters = prameters_class(N_a[j]+N_q[j],N_q[j],relevant_space[i],snap[j],D,teta_range,monte,delta,
                                             Res,method_dict) #TODO
-            Error[i, j], Error1[i, j], Error2[i,j] = general(my_parameters) #TODO
+            Error[i, j],Error1[i, j],Error2[i, j] = general(my_parameters) #TODO
             # Error1[i, j], Error2[i, j],Error3[i,j]  = norm(my_parameters)
     fig = plt.figure(figsize=(12, 8))
-    colors = ['red', 'b', 'black']
+    colors = ['red','b', 'black']
     for i in range(len(N_q)):#TODO
-        plt.plot(relevant_space, Error[:,i],linestyle='solid',color=colors[i], label=f'N_a={N_a[i]},N_q={N_q[i]}')
+        plt.plot(relevant_space, Error[:,i],linestyle='solid',color=colors[i], label=f'N_a={N_a[i]},N_q={N_q[i]}, snap={snap[i]}')
         if i < len(N_q)-1:
-            plt.plot(relevant_space, Error1[:, i], linestyle='-.',marker="o",color=colors[i],
-                     label=f'N_a={N_a[i]},N_q={N_q[i]}, Gaussian filter')
-            plt.plot(relevant_space, Error2[:, i], linestyle='dashed', marker="x", color=colors[i],
-                     label=f'N_a={N_a[i]},N_q={N_q[i]}, Sin recon.')
+            plt.plot(relevant_space, Error1[:, i], linestyle='dashed', marker="x", color=colors[i],
+                     label=f'N_a={N_a[i]},N_q={N_q[i]}, Bussgang recon.')
+            plt.plot(relevant_space, Error2[:, i], linestyle='-.', marker="o", color=colors[i],
+                     label=f'N_a={N_a[i]},N_q={N_q[i]}, Filter')
     # for i in range(len(N_q)):
     #     # plt.plot(relevant_space, Error1[:,i],linestyle='solid',color=colors[i], label=f'N_a={N_a[i]},N_q={N_q[i]}, R_analog')
     #     plt.plot(relevant_space, Error2[:, i], linestyle='solid',marker="*", color='red',
@@ -60,7 +63,7 @@ if __name__ == "__main__":
     # plt.ylabel("$|A|_F$")
     # plt.ylabel("Resolution Probability")
     plt.yscale('log')
-    plt.legend(loc='upper right', fontsize='small')
+    plt.legend(loc='lower left', fontsize='small')
     plt.show()
 
 
