@@ -7,7 +7,6 @@ from functions import quantize, observ,angles_generate,music,root_music,esprit,c
 from classes import Matrix_class, prameters_class
 from matplotlib import pyplot as plt
 
-
 def general(pram):
     rho = pram.D+10**(-pram.SNR/10)#pram.D*(10**(pram.SNR / 10))+1
     labels = np.zeros((pram.monte, pram.D))

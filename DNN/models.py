@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 import numpy as np
+from functions_NN import *
 class CNN(nn.Module):
     def __init__(self,param,n1=12,n2=12,n3=6, kernel_size=3,padding_size=2,a=0.5):
         super(CNN, self).__init__()
@@ -108,6 +109,72 @@ class LSTM(nn.Module):
         x = self.fc2(x)
         x = self.fc3(x)
         return x
+
+class SubspaceNet(nn.Module):
+    """SubspaceNet is model-based deep learning model for generalizing DOA estimation problem,
+        over subspace methods.
+        SubspaceNetEsprit is based on the ability to perform back-propagation using ESPRIT algorithm,
+        instead of RootMUSIC.
+
+    Attributes:
+    -----------
+        M (int): Number of sources.
+        tau (int): Number of auto-correlation lags.
+
+    Methods:
+    --------
+        forward(Rx_tau): Performs the forward pass of the SubspaceNet.
+
+    """
+
+    def __init__(self, tau: int, M: int):
+        super().__init__(tau, M)
+
+    def forward(self, Rx_tau: torch.Tensor):
+        """
+        Performs the forward pass of the SubspaceNet.
+
+        Args:
+        -----
+            Rx_tau (torch.Tensor): Input tensor of shape [Batch size, tau, 2N, N].
+
+        Returns:
+        --------
+            doa_prediction (torch.Tensor): The predicted direction-of-arrival (DOA) for each batch sample.
+            Rz (torch.Tensor): Surrogate covariance matrix.
+
+        """
+        # Rx_tau shape: [Batch size, tau, 2N, N]
+        self.N = Rx_tau.shape[-1]
+        self.batch_size = Rx_tau.shape[0]
+        ## Architecture flow ##
+        # CNN block #1
+        x = self.conv1(Rx_tau)
+        x = self.anti_rectifier(x)
+        # CNN block #2
+        x = self.conv2(x)
+        x = self.anti_rectifier(x)
+        # CNN block #3
+        x = self.conv3(x)
+        x = self.anti_rectifier(x)
+        # DCNN block #1
+        x = self.deconv2(x)
+        x = self.anti_rectifier(x)
+        # DCNN block #2
+        x = self.deconv3(x)
+        x = self.anti_rectifier(x)
+        # DCNN block #3
+        x = self.DropOut(x)
+        Rx = self.deconv4(x)
+        # Reshape Output shape: [Batch size, 2N, N]
+        Rx_View = Rx.view(Rx.size(0), Rx.size(2), Rx.size(3))
+        # Real and Imaginary Reconstruction
+        Rx_real = Rx_View[:, : self.N, :]  # Shape: [Batch size, N, N])
+        Rx_imag = Rx_View[:, self.N :, :]  # Shape: [Batch size, N, N])
+        Kx_tag = torch.complex(Rx_real, Rx_imag)  # Shape: [Batch size, N, N])
+        # Apply Gram operation diagonal loading
+        Rz = gram_diagonal_overload(Kx=Kx_tag, eps=1, batch_size=self.batch_size)  # Shape: [Batch size, N, N]
+        return Rz
 
 if __name__ == "__main__":
     from classes_NN import *

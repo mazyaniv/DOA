@@ -1,12 +1,14 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import math
 from classes_NN import *
 
 def generate_data(my_parameters,train_prameters,file_path):
-    data = np.zeros((my_parameters.D, train_prameters.N, my_parameters.M, my_parameters.M), dtype=np.complex128)
-    labels = np.zeros((train_prameters.N, my_parameters.D))
-    for i in range(0, train_prameters.N):
+    T = my_parameters.snap
+    data = np.zeros((train_prameters.J, my_parameters.M, T), dtype=np.complex128)
+    labels = np.zeros((train_prameters.J, my_parameters.D))
+    for i in range(0, train_prameters.J):
         if my_parameters.D == 1:
             teta = np.random.randint(my_parameters.teta_range[0], my_parameters.teta_range[1], size=my_parameters.D)
         else:
@@ -16,21 +18,87 @@ def generate_data(my_parameters,train_prameters,file_path):
                     break
             teta = np.sort(teta)[::-1]
         labels[i, :] = teta
-        Observ = quantize_part(observ(teta, my_parameters.M, my_parameters.SNR, my_parameters.snap),
-                               my_parameters.N_q)  # Quantize
-        R = np.cov(Observ)
-        data[0, i, :, :] = np.triu(R, k=1).real
-        data[1, i, :, :] = np.triu(R, k=1).imag
+        SNR = np.random.uniform(-10, 10)
+        data[i,:,:] = observ(teta, my_parameters.M, SNR, my_parameters.snap)#quantize_part(observ(teta, my_parameters.M, my_parameters.SNR, my_parameters.snap),my_parameters.N_q)
 
-    data_train = data[:, :-train_prameters.test_size, :, :]
+    data_train = data[:-train_prameters.test_size, :, :]
     labels_train = labels[:-train_prameters.test_size, :]
-    data_test = data[:, -train_prameters.test_size:, :, :]
+    data_test = data[-train_prameters.test_size:, :, :]
     labels_test = labels[-train_prameters.test_size:, :]
 
-    np.save(file_path + 'Data/' + f'data_train_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.npy', data_train)
-    np.save(file_path + 'Data/' + f'labels_train_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.npy', labels_train)
-    np.save(file_path + 'Data/' + f'data_test_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.npy', data_test)
-    np.save(file_path + 'Data/' + f'labels_test_N_a={my_parameters.M-my_parameters.N_q}_N_q={my_parameters.N_q}_SNR={my_parameters.SNR}.npy', labels_test)
+    np.save(file_path + 'Data/' + f'data_train.npy', data_train)
+    np.save(file_path + 'Data/' + f'labels_train.npy', labels_train)
+    np.save(file_path + 'Data/' + f'data_test.npy', data_test)
+    np.save(file_path + 'Data/' + f'labels_test.npy', labels_test)
+
+# def feature_exctraction(data,my_parameters):
+#     J = data.shape[0]
+#     T = my_parameters.snap
+#     sum_products = 0
+#     R_hat = np.zeros((J, T, 2*my_parameters.M,my_parameters.M))
+#     for j in range(J):
+#         for tau in range(T - 1):
+#             for t in range(T - tau):
+#                 product = data[j,:,t]@data[j,:,t+tau].conjugate().transpose()
+#                 sum_products += product
+#             R_hat[j, tau, :my_parameters.M,:] = (sum_products/(T-tau)).real
+#             R_hat[j, tau, my_parameters.M:, :] = (sum_products / (T - tau)).imag
+#     return R_hat
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# def autocorrelation_matrix(X: torch.Tensor, lag: int) -> torch.Tensor:
+def autocorrelation_matrix(X: torch.Tensor, lag: int):
+    """
+    Computes the autocorrelation matrix for a given lag of the input samples.
+
+    Args:
+    -----
+        X (torch.Tensor): Samples matrix input with shape [N, T].
+        lag (int): The requested delay of the autocorrelation calculation.
+
+    Returns:
+    --------
+        torch.Tensor: The autocorrelation matrix for the given lag.
+
+    """
+    Rx_lag = torch.zeros(X.shape[0], X.shape[0], dtype=torch.complex128).to(device)
+    for t in range(X.shape[1] - lag):
+        # meu = torch.mean(X,1)
+        x1 = torch.unsqueeze(X[:, t], 1).to(device)
+        x2 = torch.t(torch.unsqueeze(torch.conj(X[:, t + lag]), 1)).to(device)
+        Rx_lag += torch.matmul(x1 - torch.mean(X), x2 - torch.mean(X)).to(device)
+    Rx_lag = Rx_lag / (X.shape[-1] - lag)
+    Rx_lag = torch.cat((torch.real(Rx_lag), torch.imag(Rx_lag)), 0)
+    return Rx_lag
+
+
+# def create_autocorrelation_tensor(X: torch.Tensor, tau: int) -> torch.Tensor:
+def create_autocorrelation_tensor(X: torch.Tensor, tau: int):
+    """
+    Returns a tensor containing all the autocorrelation matrices for lags 0 to tau.
+
+    Args:
+    -----
+        X (torch.Tensor): Observation matrix input with size (BS, N, T).
+        tau (int): Maximal time difference for the autocorrelation tensor.
+
+    Returns:
+    --------
+        torch.Tensor: Tensor containing all the autocorrelation matrices,
+                    with size (Batch size, tau, 2N, N).
+
+    Raises:
+    -------
+        None
+
+    """
+    Rx_tau = []
+    for i in range(tau):
+        Rx_tau.append(autocorrelation_matrix(X, lag=i))
+    Rx_autocorr = torch.stack(Rx_tau, dim=0)
+    return Rx_autocorr
+
+
 def observ(teta,M,SNR,snap):
     A = Matrix_class(M, teta).matrix()
     M = A.shape[0]
@@ -47,10 +115,6 @@ def observ(teta,M,SNR,snap):
     n_samp = n.reshape(M, snap)
     x_a_samp = (A @ s_samp) + n_samp
     return x_a_samp
-
-
-
-
 def quantize_part(A,P,thresh=0):
         mask = np.zeros(np.shape(A),dtype=complex)
         mask[:P,:] = (1/math.sqrt(2))*(np.sign(A[:P,:].real-(thresh))+(1j*(np.sign(A[:P,:].imag-((thresh))))))
@@ -127,3 +191,37 @@ def test_model(model, data, labels,C):
         # print(f"RMSE : {RMSE:.2f}_Degrees,", "Number of relevant tests:",np.shape(sub_vec_new)[0])
         # print("======")
         return RMSE
+
+def gram_diagonal_overload(Kx: torch.Tensor, eps: float, batch_size: int):
+    """Multiply a matrix Kx with its Hermitian conjecture (gram matrix),
+        and adds eps to the diagonal values of the matrix,
+        ensuring a Hermitian and PSD (Positive Semi-Definite) matrix.
+
+    Args:
+    -----
+        Kx (torch.Tensor): Complex matrix with shape [BS, N, N],
+            where BS is the batch size and N is the matrix size.
+        eps (float): Constant multiplier added to each diagonal element.
+        batch_size(int): The number of batches
+
+    Returns:
+    --------
+        torch.Tensor: Hermitian and PSD matrix with shape [BS, N, N].
+
+    """
+    # Insuring Tensor input
+    if not isinstance(Kx, torch.Tensor):
+        Kx = torch.tensor(Kx)
+
+    Kx_list = []
+    bs_kx = Kx
+    for iter in range(batch_size):
+        K = bs_kx[iter]
+        # Hermitian conjecture
+        Kx_garm = torch.matmul(torch.t(torch.conj(K)), K).to(device)
+        # Diagonal loading
+        eps_addition = (eps * torch.diag(torch.ones(Kx_garm.shape[0]))).to(device)
+        Rz = Kx_garm + eps_addition
+        Kx_list.append(Rz)
+    Kx_Out = torch.stack(Kx_list, dim=0)
+    return Kx_Out
