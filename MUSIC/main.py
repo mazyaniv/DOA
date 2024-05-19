@@ -10,7 +10,7 @@ import numpy.linalg as LA
 if __name__ == "__main__":
     N_a = [0,1,10]
     N_q = [10,9,0]
-    D = 1
+    D = 2
     teta_range = [-60, 60]
     # SNR = 0
     SNR_space = np.linspace(-10, 10, 15)
