@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # SNR = 0
     SNR_space = np.linspace(-10, 10, 15)
     snap = [1100,900,500]
-    # snap_space = np.linspace(100, 1000, 10)
+    #snap_space = np.linspace(100, 1000, 10)
     monte = 400
     delta = 10 #Minimal gap between two determenistic angles
     Res = 0.1
