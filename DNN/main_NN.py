@@ -12,7 +12,7 @@ if __name__ == "__main__":
     SNR_space = np.linspace(-5, 25, 1)#np.delete(np.linspace(-5, 25, 8), [4,6])
     N_a = [10]
     N_q = [0]
-    pram = {"snap":400, "teta_range":[0,60], "D":2, "C":10}
+    pram = {"snap":350, "teta_range":[0,60], "D":2, "C":10}
     train_prameters = train_prameters(110, 10, 20, 3, 0.001)
     my_dict = {"device":"CPU",
                "Generate new data": True,
