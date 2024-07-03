@@ -92,7 +92,7 @@ def detect(pram):
                 pred1 = root_music(pram, R)
                 pred2 = root_music(pram, R2)
             elif pram.dictio['ESPRIT'] == 1:
-                pred1 = esprit(pram, R1)
+                pred1 = esprit(pram, R)
                 pred2 = esprit(pram, R2)
             if pred1.shape == teta_vector1[i,:].shape and pred2.shape == teta_vector1[i,:].shape:
                 break
